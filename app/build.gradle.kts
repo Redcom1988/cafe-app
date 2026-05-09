@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.androidstarter"
+    namespace = "com.redcom1988.cafej3"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.androidstarter"
+        applicationId = "com.redcom1988.cafej3"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android Starter"
+rootProject.name = "Cafej3"
 include(":app")
 include(":core")
 include(":data")
