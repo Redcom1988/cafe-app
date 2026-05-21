@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -17,12 +19,13 @@ object HomeScreen : Screen {
 
     @Composable
     override fun Content() {
+        val selectedItem = remember { mutableStateOf("MENU") }
 
         Scaffold(
             bottomBar = {
                 BottomNavBar(
-                    selectedItem = TODO(),
-                    onItemSelected = TODO()
+                    selectedItem = selectedItem.value,
+                    onItemSelected = { selectedItem.value = it }
                 )
             }
         ) { padding ->

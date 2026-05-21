@@ -38,10 +38,10 @@ fun BottomNavBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 10.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(40.dp))
             .background(backgroundColor)
-            .padding(horizontal = 12.dp, vertical = 18.dp)
+            .padding(horizontal = 8.dp, vertical = 10.dp)
     ) {
 
         Row(
@@ -126,7 +126,7 @@ fun BottomNavItem(
             .clickable {
                 onClick()
             }
-            .padding(horizontal = 22.dp, vertical = 14.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -134,13 +134,13 @@ fun BottomNavItem(
             painter = icon,
             contentDescription = title,
             tint = contentColor,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(22.dp)
         )
 
         Text(
             text = title,
             color = contentColor,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.Medium
         )
     }
