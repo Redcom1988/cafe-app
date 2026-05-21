@@ -18,7 +18,7 @@ import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.ScreenTransition
-import com.redcom1988.cafej3.screens.home.HomeScreen
+import com.redcom1988.cafej3.screens.login.LoginScreen
 import com.redcom1988.cafej3.theme.AppTheme
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -29,7 +29,7 @@ import soup.compose.material.motion.animation.rememberSlideDistance
 class MainActivity : ComponentActivity() {
 
     private var isReady = false
-    private var initialScreen: Screen = HomeScreen
+    private var initialScreen: Screen = LoginScreen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
