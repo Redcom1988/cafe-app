@@ -17,3 +17,10 @@ val White = Color(0xFFFFFFFF)
 
 val PinkSoft = Color(0xFFFFDBCD)
 val PinkSoft2 = Color(0xFFFFDCC5)
+
+val backgroundColor = Color(0xFFFBF3E4)
+val brownPrimary = Color(0xFF9E3D00)
+val brownDark = Color(0xFF574239)
+val grayText = Color(0xFFA8A29E)
+val softPink = Color(0xFFF3DED6)
+val inputColor = Color(0xFFE9E2D3)

@@ -46,6 +46,7 @@ import com.redcom1988.cafej3.R
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redcom1988.cafej3.screens.scan.ScanScreen
+import com.redcom1988.cafej3.theme.*
 
 
 object LoginScreen : Screen {
@@ -54,15 +55,6 @@ object LoginScreen : Screen {
 
     @Composable
     override fun Content() {
-
-        // COLOR PALETTE
-        val backgroundColor = Color(0xFFFBF3E4)
-        val brownPrimary = Color(0xFF9E3D00)
-        val brownDark = Color(0xFF574239)
-        val grayText = Color(0xFFA8A29E)
-        val softPink = Color(0xFFF3DED6)
-        val inputColor = Color(0xFFE9E2D3)
-        val white = Color(0xFFFFFFFF)
 
         var selectedTab by remember { mutableStateOf("Phone") }
         var phoneNumber by remember { mutableStateOf("") }
@@ -143,7 +135,7 @@ object LoginScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(32.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = white
+                            containerColor = White
                         ),
                         elevation = CardDefaults.cardElevation(
                             defaultElevation = 10.dp
@@ -172,7 +164,7 @@ object LoginScreen : Screen {
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(
                                             if (selectedTab == "Phone")
-                                                white
+                                                White
                                             else
                                                 Color.Transparent
                                         )
@@ -201,7 +193,7 @@ object LoginScreen : Screen {
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(
                                             if (selectedTab == "Email")
-                                                white
+                                                White
                                             else
                                                 Color.Transparent
                                         )
@@ -298,7 +290,7 @@ object LoginScreen : Screen {
 
                                 Text(
                                     text = "Sign In",
-                                    color = white,
+                                    color = White,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )

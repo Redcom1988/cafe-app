@@ -22,7 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redcom1988.cafej3.R
+import com.redcom1988.cafej3.screens.home.*
+import com.redcom1988.cafej3.screens.order.OrderScreen
+import com.redcom1988.cafej3.screens.profile.ProfileScreen
+import com.redcom1988.cafej3.screens.reward.RewardScreen
 
 @Composable
 fun BottomNavBar(
@@ -34,6 +40,7 @@ fun BottomNavBar(
     val backgroundColor = Color(0xFFFFFFFF)
     val activeColor = Color(0xFFDD5A00)
     val inactiveColor = Color(0xFFA8A29E)
+    val navigator = LocalNavigator.currentOrThrow
 
     Box(
         modifier = Modifier
@@ -57,7 +64,7 @@ fun BottomNavBar(
                 activeColor = activeColor,
                 inactiveColor = inactiveColor,
                 onClick = {
-                    onItemSelected("MENU")
+                    navigator.push(HomeScreen)
                 }
             )
 
@@ -68,7 +75,7 @@ fun BottomNavBar(
                 activeColor = activeColor,
                 inactiveColor = inactiveColor,
                 onClick = {
-                    onItemSelected("MY ORDER")
+                    navigator.push(OrderScreen)
                 }
             )
 
@@ -79,7 +86,7 @@ fun BottomNavBar(
                 activeColor = activeColor,
                 inactiveColor = inactiveColor,
                 onClick = {
-                    onItemSelected("REWARDS")
+                    navigator.push(RewardScreen)
                 }
             )
 
@@ -90,7 +97,7 @@ fun BottomNavBar(
                 activeColor = activeColor,
                 inactiveColor = inactiveColor,
                 onClick = {
-                    onItemSelected("PROFILE")
+                    navigator.push(ProfileScreen)
                 }
             )
         }

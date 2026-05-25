@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +25,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
 import com.redcom1988.cafej3.components.*
 import com.redcom1988.cafej3.theme.*
+import com.redcom1988.cafej3.R
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.remember
 
 // ================= DATA =================
 
@@ -43,10 +48,14 @@ data class TopUser(
     val points: String
 )
 
-// ================= SCREEN =================
+object RewardScreen : Screen {
+
+    private fun readResolve(): Any = RewardScreen
+
 
 @Composable
-fun RewardScreen() {
+override fun Content() {
+    val selectedItem = remember { mutableStateOf("REWARDS") }
 
     val rewards = listOf(
         RewardItem(R.drawable.reward1, "500 Points", "Free Espresso"),
@@ -60,62 +69,71 @@ fun RewardScreen() {
         TopUser(3, R.drawable.profile, "Michael Chen", "Bronze Member", "4,100"),
         TopUser(4, R.drawable.profile, "Emma Watson", "Active Member", "3,900")
     )
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .padding(horizontal = 20.dp)
-    ) {
-
-        item {
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            HeaderSection()
-
-            Spacer(modifier = Modifier.height(36.dp))
-
-            RewardBalanceCard()
-
-            Spacer(modifier = Modifier.height(36.dp))
-
-            SectionTitle(
-                title = "Available Rewards",
-                action = "See all"
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(
+                selectedItem = selectedItem.value,
+                onItemSelected = { selectedItem.value = it }
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
         }
+    ) { padding ->
 
-        item {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(horizontal = 20.dp)
+        ) {
 
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            item {
 
-                items(rewards) {
-                    RewardCard(it)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                HeaderSection()
+
+                Spacer(modifier = Modifier.height(36.dp))
+
+                RewardBalanceCard()
+
+                Spacer(modifier = Modifier.height(36.dp))
+
+                SectionTitle(
+                    title = "Available Rewards",
+                    action = "See all"
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    items(rewards) {
+                        RewardCard(it)
+                    }
                 }
             }
-        }
 
-        item {
+            item {
 
-            Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(50.dp))
 
-            Text(
-                text = "Top 4 Users",
-                color = SoftBrown,
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp
-            )
+                Text(
+                    text = "Top 4 Users",
+                    color = SoftBrown,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp
+                )
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            LeaderboardCard(users)
+                LeaderboardCard(users)
 
-            Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(120.dp))
+            }
         }
     }
 }
@@ -463,4 +481,5 @@ fun LeaderboardItem(
             )
         }
     }
+}
 }
