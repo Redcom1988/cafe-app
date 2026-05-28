@@ -8,16 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.material.icons.outlined.Logout
-import androidx.compose.material.icons.outlined.PersonOutline
-import androidx.compose.material.icons.outlined.ReceiptLong
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,247 +20,129 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.redcom1988.cafej3.components.*
-import com.redcom1988.cafej3.theme.*
-import cafe.adriel.voyager.core.screen.Screen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.runtime.remember
 import com.redcom1988.cafej3.R
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
+import com.redcom1988.cafej3.components.Header
+import com.redcom1988.cafej3.model.UserProfile
+import com.redcom1988.cafej3.theme.*
+import com.redcom1988.cafej3.viewmodel.ProfileViewModel
+import com.redcom1988.cafej3.screens.profile.components.*
 
-// ================= SCREEN =================
 object ProfileScreen : Tab {
+
     private fun readResolve(): Any = ProfileScreen
+
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Profile"
             val icon = rememberVectorPainter(Icons.Outlined.PersonOutline)
-            return remember { TabOptions(index = 2u, title = title, icon = icon) }
+            return remember { TabOptions(index = 3u, title = "Profile", icon = icon) }
         }
-    @Composable
-    override fun Content(){
-        val onEditProfileClick: () -> Unit = {}
-        val onOrderHistoryClick: () -> Unit = {}
-        val onSettingsClick: () -> Unit = {}
-        val onHelpCenterClick: () -> Unit = {}
-        val onLogoutClick: () -> Unit = {}
-        val selectedItem = remember { mutableStateOf("PROFILE") }
 
-        Scaffold(
-            bottomBar = {
-                BottomNavBar(
-                    selectedItem = selectedItem.value,
-                    onItemSelected = { selectedItem.value = it }
-                )
-            }
-        ) { padding ->
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val viewModel = viewModel<ProfileViewModel>()
+        val profile = viewModel.profile.value
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background)
-                .padding(padding)
         ) {
+                item {
+                    Header()
 
-            item {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                HeaderSection()
+                    ProfileCard(profile = profile)
 
-                Spacer(modifier = Modifier.height(34.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                ProfileCard()
+                    ProfileMenuCard(
+                        icon = { Icon(Icons.Outlined.PersonOutline, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
+                        title = "Edit Profile",
+                        subtitle = "Update your personal information",
+                        onClick = { navigator.push(EditProfileScreen(viewModel)) }
+                    )
 
-                Spacer(modifier = Modifier.height(36.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                ProfileMenuCard(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.PersonOutline,
-                            contentDescription = null,
-                            tint = Orange2,
-                            modifier = Modifier.size(34.dp)
-                        )
-                    },
-                    title = "Edit Profile",
-                    subtitle = "Update your personal information",
-                    onClick = onEditProfileClick
-                )
+                    ProfileMenuCard(
+                        icon = { Icon(Icons.Outlined.ReceiptLong, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
+                        title = "Order History",
+                        subtitle = "View all past receipts and orders",
+                        onClick = { navigator.push(OrderHistoryScreen) }
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                ProfileMenuCard(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.ReceiptLong,
-                            contentDescription = null,
-                            tint = Orange2,
-                            modifier = Modifier.size(34.dp)
-                        )
-                    },
-                    title = "Order History",
-                    subtitle = "View all past receipts and orders",
-                    onClick = onOrderHistoryClick
-                )
+                    ProfileMenuCard(
+                        icon = { Icon(Icons.Outlined.Settings, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
+                        title = "App Settings",
+                        subtitle = "Notifications, privacy, and theme",
+                        onClick = {}
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                ProfileMenuCard(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = null,
-                            tint = Orange2,
-                            modifier = Modifier.size(34.dp)
-                        )
-                    },
-                    title = "App Settings",
-                    subtitle = "Notifications, privacy, and theme",
-                    onClick = onSettingsClick
-                )
+                    ProfileMenuCard(
+                        icon = { Icon(Icons.Outlined.HelpOutline, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
+                        title = "Help Center",
+                        subtitle = "Contact support and FAQs",
+                        onClick = {}
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                ProfileMenuCard(
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.HelpOutline,
-                            contentDescription = null,
-                            tint = Orange2,
-                            modifier = Modifier.size(34.dp)
-                        )
-                    },
-                    title = "Help Center",
-                    subtitle = "Contact support and FAQs",
-                    onClick = onHelpCenterClick
-                )
+                    LogoutButton(onClick = {})
 
-                Spacer(modifier = Modifier.height(60.dp))
-
-                LogoutButton(
-                    onClick = onLogoutClick
-                )
-
-                Spacer(modifier = Modifier.height(120.dp))
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
             }
         }
-    }
-    }
-
-// ================= HEADER =================
 
     @Composable
-    fun HeaderSection() {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(White)
-                .padding(horizontal = 24.dp, vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    text = "✕",
-                    color = Orange2,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-
-                Spacer(modifier = Modifier.width(14.dp))
-
-                Text(
-                    text = "XXXX",
-                    color = DarkBrown,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-            }
-
-            Image(
-                painter = painterResource(id = R.drawable.profile),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        }
-    }
-
-// ================= PROFILE CARD =================
-
-    @Composable
-    fun ProfileCard() {
-
+    fun ProfileCard(profile: UserProfile) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 22.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(34.dp))
                 .background(White)
-                .padding(vertical = 30.dp),
+                .padding(vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Box {
-
                 Image(
                     painter = painterResource(id = R.drawable.profile2),
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(190.dp)
-                        .clip(CircleShape),
+                    modifier = Modifier.size(80.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .size(56.dp)
+                        .size(28.dp)
                         .clip(CircleShape)
                         .background(Orange2),
                     contentAlignment = Alignment.Center
                 ) {
-
-                    Icon(
-                        imageVector = Icons.Default.Verified,
-                        contentDescription = null,
-                        tint = White,
-                        modifier = Modifier.size(28.dp)
-                    )
+                    Icon(Icons.Default.Verified, contentDescription = null, tint = White, modifier = Modifier.size(14.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.height(22.dp))
-
-            Text(
-                text = "Alex User",
-                color = DarkBrown,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Member since October 2022",
-                color = SoftBrown,
-                fontSize = 18.sp
-            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = profile.name, color = DarkBrown, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(text = "Member since ${profile.memberSince}", color = SoftBrown, fontSize = 13.sp)
         }
     }
-
-// ================= MENU CARD =================
 
     @Composable
     fun ProfileMenuCard(
@@ -275,98 +151,51 @@ object ProfileScreen : Tab {
         subtitle: String,
         onClick: () -> Unit
     ) {
-
         Row(
             modifier = Modifier
                 .padding(horizontal = 22.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(30.dp))
                 .background(White)
-                .clickable {
-                    onClick()
-                }
-                .padding(horizontal = 22.dp, vertical = 26.dp),
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
-                    .size(88.dp)
-                    .clip(RoundedCornerShape(26.dp))
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(Cream),
                 contentAlignment = Alignment.Center
             ) {
-
                 icon()
             }
-
-            Spacer(modifier = Modifier.width(20.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-
-                Text(
-                    text = title,
-                    color = DarkBrown,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp
-                )
-
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = title, color = DarkBrown, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = subtitle,
-                    color = SoftBrown,
-                    fontSize = 16.sp
-                )
+                Text(text = subtitle, color = SoftBrown, fontSize = 12.sp)
             }
-
-            Icon(
-                imageVector = Icons.Outlined.ArrowForwardIos,
-                contentDescription = null,
-                tint = SoftBrown,
-                modifier = Modifier.size(22.dp)
-            )
+            Icon(Icons.Outlined.ArrowForwardIos, contentDescription = null, tint = SoftBrown, modifier = Modifier.size(16.dp))
         }
     }
 
-// ================= LOGOUT BUTTON =================
-
     @Composable
-    fun LogoutButton(
-        onClick: () -> Unit
-    ) {
-
+    fun LogoutButton(onClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .padding(horizontal = 22.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(50.dp))
                 .background(PrimaryOrange)
-                .clickable {
-                    onClick()
-                }
-                .padding(vertical = 26.dp),
+                .clickable { onClick() }
+                .padding(vertical = 14.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Icon(
-                imageVector = Icons.Outlined.Logout,
-                contentDescription = null,
-                tint = White,
-                modifier = Modifier.size(34.dp)
-            )
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Text(
-                text = "Log Out",
-                color = White,
-                fontWeight = FontWeight.Medium,
-                fontSize = 24.sp
-            )
+            Icon(Icons.Outlined.Logout, contentDescription = null, tint = White, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Log Out", color = White, fontWeight = FontWeight.Medium, fontSize = 16.sp)
         }
     }
 }

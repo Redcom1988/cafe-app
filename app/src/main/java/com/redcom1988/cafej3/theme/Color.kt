@@ -2,7 +2,7 @@ package com.redcom1988.cafej3.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Background = Color(0xFFFFF8EF)
+val Background = Color(0xFFF1E5D8)
 
 val PrimaryOrange = Color(0xFF9E3D00)
 val Orange2 = Color(0xFFC64F00)
@@ -24,3 +24,7 @@ val brownDark = Color(0xFF574239)
 val grayText = Color(0xFFA8A29E)
 val softPink = Color(0xFFF3DED6)
 val inputColor = Color(0xFFE9E2D3)
+val backgroundColorNav = Color(0xFFFFFFFF)
+val activeChoosedColor = Color(0xFFD35400)
+val activeColor = Color(0xFFFFFFFF)
+val inactiveColor = Color(0xFF707070)
