@@ -82,7 +82,7 @@ data object ScanCheckInScreen : Screen {
 
             PrimaryButton(
                 text = "Skip — Enter Manually",
-                onClick = { navigator.replace(MainScreen()) }
+                onClick = { navigator.replace(MainScreen) }
             )
         }
     }

@@ -151,7 +151,7 @@ data object RegisterScreen : Screen {
                 text = if (state.isLoading) "Creating Account..." else "Create Account",
                 onClick = {
                     screenModel.submit {
-                        navigator.replace(MainScreen())
+                        navigator.replace(MainScreen)
                     }
                 },
                 enabled = !state.isLoading &&

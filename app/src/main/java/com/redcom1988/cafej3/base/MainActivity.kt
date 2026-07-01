@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
         val networkPreference = inject<NetworkPreference>()
         val token = networkPreference.accessToken().get()
-        val initialScreen: Screen = if (token.isNotBlank()) MainScreen() else SignInScreen
+        val initialScreen: Screen = if (token.isNotBlank()) MainScreen else SignInScreen
 
         enableEdgeToEdge()
         setContent {

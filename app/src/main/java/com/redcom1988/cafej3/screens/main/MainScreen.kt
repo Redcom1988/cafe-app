@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.redcom1988.cafej3.components.AppTab
 import com.redcom1988.cafej3.components.BottomNavBar
-import com.redcom1988.cafej3.components.UserRole
 import com.redcom1988.cafej3.components.bottomNavItems
 import com.redcom1988.cafej3.screens.cart.CartOrderScreen
 import com.redcom1988.cafej3.screens.financial.FinancialLedgerScreen
@@ -30,14 +29,14 @@ import com.redcom1988.cafej3.screens.rewards.RewardsScreen
 
 val LocalTabSwitcher = compositionLocalOf<(AppTab) -> Unit> { {} }
 
-data class MainScreen(val role: UserRole = UserRole.CUSTOMER) : Screen {
+data object MainScreen : Screen {
 
     @Suppress("unused")
-    private fun readResolve(): Any = MainScreen(role)
+    private fun readResolve(): Any = MainScreen
 
     @Composable
     override fun Content() {
-        val items = remember { bottomNavItems(role) }
+        val items = remember { bottomNavItems() }
         val tabSaver = remember { Saver<AppTab, Int>(save = { it.ordinal }, restore = { AppTab.entries[it] }) }
         var currentTab by rememberSaveable(stateSaver = tabSaver) { mutableStateOf(AppTab.Menu) }
         val density = LocalDensity.current

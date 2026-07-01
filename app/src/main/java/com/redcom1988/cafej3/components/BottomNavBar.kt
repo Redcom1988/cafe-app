@@ -2,12 +2,10 @@ package com.redcom1988.cafej3.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -24,7 +22,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 enum class AppTab { Menu, CartOrder, Rewards, Financial, Profile }
-enum class UserRole { CUSTOMER, CASHIER }
 
 data class BottomNavItem(
     val label: String,
@@ -33,20 +30,12 @@ data class BottomNavItem(
     val unselectedIcon: ImageVector
 )
 
-fun bottomNavItems(role: UserRole): List<BottomNavItem> = when (role) {
-    UserRole.CUSTOMER -> listOf(
-        BottomNavItem("Menu", AppTab.Menu, Icons.Filled.Menu, Icons.Outlined.Menu),
-        BottomNavItem("My Order", AppTab.CartOrder, Icons.Filled.ShoppingCart, Icons.Outlined.ShoppingCart),
-        BottomNavItem("Rewards", AppTab.Rewards, Icons.Filled.Star, Icons.Outlined.Star),
-        BottomNavItem("Profile", AppTab.Profile, Icons.Filled.Person, Icons.Outlined.Person),
-    )
-    UserRole.CASHIER -> listOf(
-        BottomNavItem("Menu", AppTab.Menu, Icons.Filled.Menu, Icons.Outlined.Menu),
-        BottomNavItem("Order", AppTab.CartOrder, Icons.Filled.ShoppingCart, Icons.Outlined.ShoppingCart),
-        BottomNavItem("Financial", AppTab.Financial, Icons.Filled.AttachMoney, Icons.Outlined.AttachMoney),
-        BottomNavItem("Profile", AppTab.Profile, Icons.Filled.Person, Icons.Outlined.Person),
-    )
-}
+fun bottomNavItems(): List<BottomNavItem> = listOf(
+    BottomNavItem("Menu", AppTab.Menu, Icons.Filled.Menu, Icons.Outlined.Menu),
+    BottomNavItem("My Order", AppTab.CartOrder, Icons.Filled.ShoppingCart, Icons.Outlined.ShoppingCart),
+    BottomNavItem("Rewards", AppTab.Rewards, Icons.Filled.Star, Icons.Outlined.Star),
+    BottomNavItem("Profile", AppTab.Profile, Icons.Filled.Person, Icons.Outlined.Person),
+)
 
 @Composable
 fun BottomNavBar(

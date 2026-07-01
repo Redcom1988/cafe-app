@@ -1,11 +1,13 @@
 package com.redcom1988.domain.points.interactor
 
 import com.redcom1988.domain.points.repository.PointRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetPointBalance(
     private val pointRepository: PointRepository
 ) {
-    suspend fun await(userId: Int): Int {
-        return pointRepository.getBalance(userId)
+    suspend fun await(userId: Int): Int = withContext(Dispatchers.IO) {
+        pointRepository.getBalance(userId)
     }
 }

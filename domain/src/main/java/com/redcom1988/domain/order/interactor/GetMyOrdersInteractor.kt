@@ -2,11 +2,13 @@ package com.redcom1988.domain.order.interactor
 
 import com.redcom1988.domain.order.model.Order
 import com.redcom1988.domain.order.repository.OrderRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetMyOrders(
     private val orderRepository: OrderRepository
 ) {
-    suspend fun await(userId: Int): List<Order> {
-        return orderRepository.getMyOrders(userId)
+    suspend fun await(userId: Int): List<Order> = withContext(Dispatchers.IO) {
+        orderRepository.getMyOrders(userId)
     }
 }

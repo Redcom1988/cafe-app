@@ -128,7 +128,7 @@ data object SignInScreen : Screen {
                 text = if (state.isLoading) "Signing in..." else "Sign In",
                 onClick = {
                     screenModel.login {
-                        navigator.replace(MainScreen())
+                        navigator.replace(MainScreen)
                     }
                 },
                 enabled = !state.isLoading && state.email.isNotBlank() && state.password.isNotBlank()

@@ -2,6 +2,8 @@ package com.redcom1988.domain.order.interactor
 
 import com.redcom1988.domain.order.model.Order
 import com.redcom1988.domain.order.repository.OrderRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CreateOrder(
     private val orderRepository: OrderRepository
@@ -11,7 +13,7 @@ class CreateOrder(
         userId: Int? = null,
         customerName: String? = null,
         items: List<Pair<Int, Int>>
-    ): Order {
-        return orderRepository.createOrder(tableId, userId, customerName, items)
+    ): Order = withContext(Dispatchers.IO) {
+        orderRepository.createOrder(tableId, userId, customerName, items)
     }
 }
