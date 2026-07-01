@@ -36,6 +36,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -57,6 +63,7 @@ dependencies {
     implementation(libs.material.icons)
     implementation(libs.material.motion.compose.core)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
     implementation(libs.voyager.navigator)
     implementation(libs.voyager.tabNavigator)

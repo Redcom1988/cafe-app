@@ -30,6 +30,12 @@ android {
 
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -41,5 +47,7 @@ dependencies {
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
+
+    implementation(project(":core"))
 
 }

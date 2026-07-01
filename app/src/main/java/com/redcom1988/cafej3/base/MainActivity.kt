@@ -3,8 +3,6 @@ package com.redcom1988.cafej3.base
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,8 +16,11 @@ import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.ScreenTransition
-import com.redcom1988.cafej3.screens.home.HomeScreen
+import com.redcom1988.cafej3.screens.main.MainScreen
 import com.redcom1988.cafej3.theme.AppTheme
+import com.redcom1988.cafej3.screens.signin.SignInScreen
+import com.redcom1988.core.util.inject
+import com.redcom1988.core.network.NetworkPreference
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -28,27 +29,12 @@ import soup.compose.material.motion.animation.rememberSlideDistance
 
 class MainActivity : ComponentActivity() {
 
-    private var isReady = false
-    private var initialScreen: Screen = HomeScreen
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val content: View = findViewById(android.R.id.content)
-        content.viewTreeObserver.addOnPreDrawListener(
-            object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    return if (isReady) {
-                        content.viewTreeObserver.removeOnPreDrawListener(this)
-                        true
-                    } else {
-                        false
-                    }
-                }
-            }
-        )
-
-        handlePreDraw()
+        val networkPreference = inject<NetworkPreference>()
+        val token = networkPreference.accessToken().get()
+        val initialScreen: Screen = if (token.isNotBlank()) MainScreen() else SignInScreen
 
         enableEdgeToEdge()
         setContent {
@@ -77,11 +63,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun handlePreDraw() {
-        // Handle pre draw here (e.g. Splash Screen, fetch data, etc)
-        isReady = true
-    }
-
     @Composable
     private fun HandleNewIntent(context: Context, navigator: Navigator) {
         LaunchedEffect(Unit) {
@@ -95,6 +76,5 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntentAction(intent: Intent, navigator: Navigator) {
-        // Handle intent here
     }
 }

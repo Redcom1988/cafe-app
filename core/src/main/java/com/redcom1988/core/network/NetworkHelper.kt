@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.redcom1988.core.network.interceptor.AuthInterceptor
 import com.redcom1988.core.network.interceptor.IgnoreGzipInterceptor
 import com.redcom1988.core.network.interceptor.UncaughtExceptionInterceptor
 import okhttp3.Cache
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.brotli.BrotliInterceptor
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,6 +19,7 @@ import java.util.concurrent.TimeUnit
 class NetworkHelper(
     private val context: Context,
     private val isDebugBuild: Boolean,
+    private val authInterceptor: Interceptor = Interceptor { chain -> chain.proceed(chain.request()) },
 ) {
 
     private val connectivityManager = context
@@ -36,6 +39,7 @@ class NetworkHelper(
             .addInterceptor(UncaughtExceptionInterceptor())
             .addNetworkInterceptor(IgnoreGzipInterceptor())
             .addNetworkInterceptor(BrotliInterceptor)
+            .addInterceptor(authInterceptor)
 
         if (isDebugBuild) {
             val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
