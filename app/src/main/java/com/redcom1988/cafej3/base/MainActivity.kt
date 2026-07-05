@@ -6,7 +6,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -25,8 +28,8 @@ import com.redcom1988.domain.table.interactor.TableSession
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
-import soup.compose.material.motion.animation.materialSharedAxisX
-import soup.compose.material.motion.animation.rememberSlideDistance
+import androidx.compose.ui.graphics.Color
+
 
 class MainActivity : ComponentActivity() {
 
@@ -47,25 +50,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                val slideDistance = rememberSlideDistance()
-                Navigator(
-                    screen = initialScreen,
-                    disposeBehavior = NavigatorDisposeBehavior(
-                        disposeNestedNavigators = false,
-                        disposeSteps = true,
-                    )
-                ) { navigator ->
-                    ScreenTransition(
-                        modifier = Modifier.fillMaxSize(),
-                        navigator = navigator,
-                        transition = {
-                            materialSharedAxisX(
-                                forward = navigator.lastEvent != StackEvent.Pop,
-                                slideDistance = slideDistance,
-                            )
-                        },
-                    )
-                    HandleNewIntent(this@MainActivity, navigator)
+                TabNavigator(HomeScreen) { tabNavigator ->
+                    Scaffold(
+                        containerColor = Color.White,
+                        bottomBar = {
+                            BottomNavBar(tabNavigator = tabNavigator)
+                        }
+                    ) { padding ->
+                        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                            CurrentTab()
+                        }
+                    }
                 }
             }
         }
