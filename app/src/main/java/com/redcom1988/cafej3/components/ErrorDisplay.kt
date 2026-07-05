@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ErrorDisplay(
+    modifier: Modifier = Modifier,
     message: String?,
     onRetry: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
     if (message != null) {
         Column(

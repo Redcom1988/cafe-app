@@ -154,13 +154,6 @@ class Cafej3Api(
         ).await()
     }
 
-    suspend fun updateOrderItemUnitStatus(orderId: Int, unitId: Int, status: String): Response {
-        val body = json.encodeToString(mapOf("status" to status)).toRequestBody(jsonMediaType)
-        return networkHelper.client.newCall(
-            PATCH(url = "$baseUrl/orders/$orderId/items/$unitId/status", body = body)
-        ).await()
-    }
-
     // ── Points ──
     suspend fun getPointBalance(): Response {
         return networkHelper.client.newCall(

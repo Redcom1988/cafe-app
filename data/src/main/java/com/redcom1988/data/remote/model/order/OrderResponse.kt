@@ -34,7 +34,7 @@ data class OrderItemResponse(
     val orderItemId: Int,
     val menuItemId: Int = 0,
     val quantity: Int,
-    val itemPriceAtOrder: String,
+    val itemPriceAtOrder: String? = null,
     val subtotal: String,
     val note: String? = null,
     val menuItem: MenuItemBrief? = null,

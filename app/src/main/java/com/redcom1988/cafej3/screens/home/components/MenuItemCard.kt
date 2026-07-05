@@ -36,7 +36,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
@@ -44,12 +43,13 @@ import com.redcom1988.domain.menu.model.MenuItem
 
 @Composable
 fun MenuItemCard(
+    modifier: Modifier = Modifier,
     item: MenuItem,
     quantity: Int = 0,
     onAddToCart: () -> Unit,
     onIncrement: () -> Unit = onAddToCart,
     onDecrement: () -> Unit,
-    modifier: Modifier = Modifier
+    canOrder: Boolean = true
 ) {
     val alpha = if (item.isAvailable) 1f else 0.5f
 
@@ -180,7 +180,7 @@ fun MenuItemCard(
                             Spacer(modifier = Modifier.width(8.dp))
                             IconButton(
                                 onClick = onIncrement,
-                                enabled = item.isAvailable,
+                                enabled = item.isAvailable && canOrder,
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
@@ -194,7 +194,7 @@ fun MenuItemCard(
                 } else {
                     Button(
                         onClick = onAddToCart,
-                        enabled = item.isAvailable,
+                        enabled = item.isAvailable && canOrder,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -203,7 +203,7 @@ fun MenuItemCard(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = if (item.isAvailable) "Add to Cart" else "Unavailable",
+                            text = if (item.isAvailable && canOrder) "Add to Cart" else if (!item.isAvailable) "Unavailable" else "Order in progress",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )

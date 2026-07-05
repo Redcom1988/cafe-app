@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -118,11 +119,7 @@ data object CartOrderScreen : Screen {
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        if (isGuest) {
-                            IconButton(onClick = { navigator.pop() }) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to Login")
-                            }
-                        }
+                        // Back button removed for guests to lock them into order tracking
                     },
                     title = {
                         Text("My Order", fontWeight = FontWeight.Bold)
@@ -175,12 +172,15 @@ data object CartOrderScreen : Screen {
                             when (state.selectedCartTab) {
                                 0 -> {
                                     Box(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 16.dp)) {
-                                        if (items.isNotEmpty()) {
+                                        if (isGuest && state.pendingOrders.isNotEmpty()) {
+                                            OngoingOrderRestrictedContent(onGoToOrders = { screenModel.setCartTab(1) })
+                                        } else if (items.isNotEmpty()) {
                                             CartContent(
                                                 items = items,
                                                 total = subtotal,
                                                 state = state,
-                                                screenModel = screenModel
+                                                screenModel = screenModel,
+                                                isGuest = isGuest
                                             )
                                         } else {
                                             EmptyCartContent(
@@ -282,7 +282,8 @@ data object CartOrderScreen : Screen {
         items: List<com.redcom1988.domain.cart.CartItem>,
         total: String,
         state: CartUiState,
-        screenModel: CartScreenModel
+        screenModel: CartScreenModel,
+        isGuest: Boolean
     ) {
         val cartNavigator = LocalNavigator.currentOrThrow
         Column(modifier = Modifier.fillMaxSize()) {
@@ -328,75 +329,77 @@ data object CartOrderScreen : Screen {
                 PriceRow("Total", "Rp$total", bold = true)
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Offer",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = if (state.selectedUserOfferId != null) "Change" else "Select",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 13.sp,
-                    modifier = Modifier.clickable {
-                        cartNavigator.push(OfferSelectionScreen)
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            val selectedOffer = state.selectedUserOfferId?.let { id ->
-                state.userOffers.find { it.id == id }
-            }
-            if (selectedOffer != null) {
+            if (!isGuest) {
+                Spacer(modifier = Modifier.height(12.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = selectedOffer.offer?.name ?: "Offer #${selectedOffer.offerId}",
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        text = "Offer",
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    IconButton(
-                        onClick = { screenModel.selectOffer(null) },
-                        modifier = Modifier.size(20.dp)
+                    Text(
+                        text = if (state.selectedUserOfferId != null) "Change" else "Select",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 13.sp,
+                        modifier = Modifier.clickable {
+                            cartNavigator.push(OfferSelectionScreen)
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                val selectedOffer = state.selectedUserOfferId?.let { id ->
+                    state.userOffers.find { it.id == id }
+                }
+                if (selectedOffer != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Remove offer",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(16.dp)
+                        Text(
+                            text = selectedOffer.offer?.name ?: "Offer #${selectedOffer.offerId}",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp
+                        )
+                        IconButton(
+                            onClick = { screenModel.selectOffer(null) },
+                            modifier = Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove offer",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { cartNavigator.push(OfferSelectionScreen) },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Text(
+                            text = "Select an offer",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(12.dp)
                         )
                     }
-                }
-            } else {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { cartNavigator.push(OfferSelectionScreen) },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Text(
-                        text = "Select an offer",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(12.dp)
-                    )
                 }
             }
 
@@ -420,6 +423,41 @@ data object CartOrderScreen : Screen {
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun OngoingOrderRestrictedContent(onGoToOrders: () -> Unit) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Ongoing Order",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "You already have an active order. Please finish it or check its status in the Orders tab.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                PrimaryButton(
+                    text = "View Orders",
+                    onClick = onGoToOrders
                 )
             }
         }

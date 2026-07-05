@@ -16,6 +16,9 @@ import com.redcom1988.cafej3.screens.profile.ProfileScreen
 import com.redcom1988.cafej3.screens.rewards.RewardsScreen
 
 data object MenuTab : Tab {
+    @Suppress("unused")
+    private fun readResolve(): Any = MenuTab
+
     override val options: TabOptions
         @Composable get() = TabOptions(
             index = 0u,
@@ -30,6 +33,9 @@ data object MenuTab : Tab {
 }
 
 data object CartOrderTab : Tab {
+    @Suppress("unused")
+    private fun readResolve(): Any = CartOrderTab
+
     override val options: TabOptions
         @Composable get() = TabOptions(
             index = 1u,
@@ -44,6 +50,9 @@ data object CartOrderTab : Tab {
 }
 
 data object RewardsTab : Tab {
+    @Suppress("unused")
+    private fun readResolve(): Any = RewardsTab
+
     override val options: TabOptions
         @Composable get() = TabOptions(
             index = 2u,
@@ -58,6 +67,9 @@ data object RewardsTab : Tab {
 }
 
 data object ProfileTab : Tab {
+    @Suppress("unused")
+    private fun readResolve(): Any = ProfileTab
+
     override val options: TabOptions
         @Composable get() = TabOptions(
             index = 3u,
@@ -72,6 +84,9 @@ data object ProfileTab : Tab {
 }
 
 data object FinancialTab : Tab {
+    @Suppress("unused")
+    private fun readResolve(): Any = FinancialTab
+
     override val options: TabOptions
         @Composable get() = TabOptions(
             index = 4u,

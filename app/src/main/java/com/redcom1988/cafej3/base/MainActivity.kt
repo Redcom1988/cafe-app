@@ -21,6 +21,7 @@ import com.redcom1988.cafej3.theme.AppTheme
 import com.redcom1988.cafej3.screens.login.LoginScreen
 import com.redcom1988.core.util.inject
 import com.redcom1988.core.network.NetworkPreference
+import com.redcom1988.domain.table.interactor.TableSession
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -33,8 +34,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val networkPreference = inject<NetworkPreference>()
+        val tableSession = inject<TableSession>()
         val token = networkPreference.accessToken().get()
-        val initialScreen: Screen = if (token.isNotBlank()) MainScreen() else LoginScreen
+        val hasActiveGuestOrder = tableSession.hasTrackingToken()
+
+        val initialScreen: Screen = when {
+            token.isNotBlank() -> MainScreen(isGuest = false)
+            hasActiveGuestOrder -> MainScreen(isGuest = true)
+            else -> LoginScreen
+        }
 
         enableEdgeToEdge()
         setContent {
@@ -71,10 +79,10 @@ class MainActivity : ComponentActivity() {
                 val consumer = Consumer<Intent> { trySend(it) }
                 componentActivity.addOnNewIntentListener(consumer)
                 awaitClose { componentActivity.removeOnNewIntentListener(consumer) }
-            }.collectLatest { handleIntentAction(it, navigator) }
+            }.collectLatest { handleIntentAction() }
         }
     }
 
-    private fun handleIntentAction(intent: Intent, navigator: Navigator) {
+    private fun handleIntentAction() {
     }
 }

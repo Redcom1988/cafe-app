@@ -4,7 +4,7 @@ data class OrderItem(
     val id: Int,
     val menuItemId: Int,
     val quantity: Int,
-    val itemPriceAtOrder: String,
+    val itemPriceAtOrder: String?,
     val subtotal: String,
     val note: String? = null,
     val menuItemName: String? = null,

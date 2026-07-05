@@ -8,7 +8,6 @@ import com.redcom1988.domain.auth.interactor.Login
 import com.redcom1988.domain.auth.interactor.Logout
 import com.redcom1988.domain.auth.interactor.Register
 import com.redcom1988.domain.auth.interactor.UpdateProfile
-import com.redcom1988.core.preference.PreferenceStore
 import com.redcom1988.domain.cart.CartManager
 import com.redcom1988.domain.menu.interactor.GetCategories
 import com.redcom1988.domain.menu.interactor.GetMenuItems

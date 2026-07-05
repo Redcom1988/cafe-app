@@ -78,15 +78,10 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
 
-    // CameraX
-    implementation("androidx.camera:camera-core:1.6.1")
-    implementation("androidx.camera:camera-camera2:1.6.1")
-    implementation("androidx.camera:camera-lifecycle:1.6.1")
-    implementation("androidx.camera:camera-view:1.6.1")
-
-    // MLKit barcode scanning
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
-
-    // Accompanist permissions
-    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation(libs.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.accompanist.permissions)
 }

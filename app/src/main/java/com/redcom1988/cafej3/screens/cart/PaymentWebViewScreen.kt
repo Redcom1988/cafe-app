@@ -8,6 +8,7 @@ import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -39,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
 data class PaymentWebViewScreen(
     val paymentUrl: String,
     val orderId: Int
@@ -58,6 +60,8 @@ data class PaymentWebViewScreen(
         var showBackDialog by remember { mutableStateOf(false) }
         var paymentConfirmed by remember { mutableStateOf(false) }
 
+        var webView by remember { mutableStateOf<WebView?>(null) }
+        
         if (showBackDialog) {
             AlertDialog(
                 onDismissRequest = { showBackDialog = false },
@@ -88,6 +92,11 @@ data class PaymentWebViewScreen(
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
+                    actions = {
+                        IconButton(onClick = { webView?.reload() }) {
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                 )
             },
@@ -104,6 +113,7 @@ data class PaymentWebViewScreen(
                 AndroidView(
                     factory = { context ->
                         WebView(context).apply {
+                            webView = this
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
                             settings.loadWithOverviewMode = true
@@ -118,7 +128,7 @@ data class PaymentWebViewScreen(
                                 }
 
                                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                    val url = request?.url.toString() ?: ""
+                                    val url = request?.url.toString()
 
                                     if (!paymentConfirmed && url.contains("payment-finish")) {
                                         paymentConfirmed = true

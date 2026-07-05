@@ -50,6 +50,7 @@ import com.redcom1988.cafej3.screens.home.components.CategoryTabs
 import com.redcom1988.cafej3.screens.home.components.HeroSection
 import com.redcom1988.cafej3.screens.home.components.MenuItemCard
 import com.redcom1988.cafej3.screens.guest.LocalIsGuest
+import com.redcom1988.cafej3.screens.login.LoginScreen
 import com.redcom1988.cafej3.screens.scan.ScanQrScreen
 import com.redcom1988.core.util.inject
 import com.redcom1988.domain.cart.CartManager
@@ -68,6 +69,8 @@ data object MenuScreen : Screen {
         val cartItems by cartManager.items.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
         val isGuest = LocalIsGuest.current
+        val hasActiveGuestOrder = screenModel.hasTrackingToken()
+        val canOrder = !isGuest || !hasActiveGuestOrder
         val tableLabel = screenModel.tableNumber()
         fun cartQuantity(itemId: Int): Int = cartItems.find { it.menuItem.id == itemId }?.quantity ?: 0
 
@@ -81,11 +84,7 @@ data object MenuScreen : Screen {
                     TopAppBar(
                         title = { Text("Menu", fontWeight = FontWeight.Bold) },
                         navigationIcon = {
-                            if (isGuest) {
-                                IconButton(onClick = { navigator.pop() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to Login")
-                                }
-                            }
+                            // Back button removed for guests to lock them into order tracking
                         },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
                     )
@@ -124,11 +123,7 @@ data object MenuScreen : Screen {
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        if (isGuest) {
-                            IconButton(onClick = { navigator.pop() }) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to Login")
-                            }
-                        }
+                        // Back button removed for guests to lock them into order tracking
                     },
                     title = {
                         Column {
@@ -143,8 +138,17 @@ data object MenuScreen : Screen {
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navigator.push(ScanQrScreen) }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Change Table")
+                        IconButton(onClick = {
+                            if (isGuest) {
+                                navigator.replaceAll(LoginScreen)
+                            } else {
+                                navigator.push(ScanQrScreen)
+                            }
+                        }) {
+                            Icon(
+                                imageVector = if (isGuest) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Edit,
+                                contentDescription = if (isGuest) "Back to Login" else "Change Table"
+                            )
                         }
                         IconButton(onClick = { screenModel.toggleSearch() }) {
                             Icon(
@@ -232,9 +236,10 @@ data object MenuScreen : Screen {
                                 MenuItemCard(
                                     item = item,
                                     quantity = cartQuantity(item.id),
-                                    onAddToCart = { cartManager.addItem(item) },
-                                    onIncrement = { cartManager.addItem(item) },
-                                    onDecrement = { cartManager.updateQuantity(item.id, -1) }
+                                    onAddToCart = { if (canOrder) cartManager.addItem(item) },
+                                    onIncrement = { if (canOrder) cartManager.addItem(item) },
+                                    onDecrement = { cartManager.updateQuantity(item.id, -1) },
+                                    canOrder = canOrder
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                             }

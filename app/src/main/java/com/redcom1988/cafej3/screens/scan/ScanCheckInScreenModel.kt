@@ -68,7 +68,4 @@ class ScanCheckInScreenModel(
         _state.value = ScanUiState()
     }
 
-    fun clearTable() {
-        tableSession.clear()
-    }
 }

@@ -83,9 +83,11 @@ class CartScreenModel(
                     )
                 } else {
                     // Guest: load single active order
-                    if (tableSession.hasActiveOrder()) {
+                    val hasActiveOrder = tableSession.hasActiveOrder()
+                    val hasToken = tableSession.hasTrackingToken()
+                    if (hasActiveOrder) {
                         val orderId = tableSession.getActiveOrderId()
-                        val order = if (tableSession.hasTrackingToken()) {
+                        val order = if (hasToken) {
                             getOrderDetail.trackGuest(orderId, tableSession.getTrackingToken())
                         } else {
                             getOrderDetail.await(orderId)
@@ -99,7 +101,7 @@ class CartScreenModel(
                         _state.value = _state.value.copy(isLoading = false)
                     }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 _state.value = _state.value.copy(isLoading = false)
             }
         }
@@ -145,6 +147,7 @@ class CartScreenModel(
     }
 
     fun loadUserOffers() {
+        if (networkPreference.accessToken().get().isBlank()) return
         screenModelScope.launch {
             try {
                 val offers = getUserOffers.await()
@@ -195,17 +198,25 @@ class CartScreenModel(
             _state.value = _state.value.copy(isLoading = true, error = null)
             try {
                 val isLoggedIn = networkPreference.accessToken().get().isNotBlank()
+                if (!isLoggedIn && _state.value.pendingOrders.isNotEmpty()) {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = "You already have an active order. Please finish it before starting a new one."
+                    )
+                    return@launch
+                }
+                
                 val tableId = tableSession.getTableId().takeIf { it > 0 }
                 val items = cartManager.items.value.map { it.menuItem.id to it.quantity }
-
+                
                 val selectedOfferId = _state.value.selectedUserOfferId
-
+                
                 val order = if (isLoggedIn) {
                     createAuthenticatedOrder.await(tableId = tableId, userOfferId = selectedOfferId, items = items)
                 } else {
                     createOrder.await(tableId = tableId, items = items)
                 }
-
+                
                 val token = order.trackingToken
                 cartManager.clear()
                 tableSession.setActiveOrderId(order.id)
@@ -215,7 +226,7 @@ class CartScreenModel(
                     pendingOrderId = order.id,
                     lastOrder = order
                 )
-
+                
                 if (token != null) {
                     tableSession.setTrackingToken(token)
                 }
@@ -243,25 +254,6 @@ class CartScreenModel(
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Failed to cancel order"
-                )
-            }
-        }
-    }
-
-    fun confirmPayment(orderId: Int) {
-        screenModelScope.launch {
-            try {
-                confirmPayment.await(orderId)
-                cartManager.clear()
-                tableSession.setActiveOrderId(orderId)
-                _state.value = _state.value.copy(
-                    paymentUrl = null,
-                    pendingOrderId = null,
-                    orderSuccess = true
-                )
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = e.message ?: "Failed to confirm payment"
                 )
             }
         }

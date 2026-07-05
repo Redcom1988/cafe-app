@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreditCard
@@ -26,7 +25,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -189,7 +187,6 @@ data object RewardsScreen : Screen {
                                 items(state.offers, key = { it.id }) { offer ->
                                     OfferCard(
                                         offer = offer,
-                                        balance = state.balance,
                                         isRedeeming = state.redeemingOfferId == offer.id,
                                         canRedeem = state.balance >= offer.cost,
                                         onRedeem = { screenModel.redeem(offer.id) }
@@ -270,7 +267,6 @@ data object RewardsScreen : Screen {
 @Composable
 private fun OfferCard(
     offer: Offer,
-    balance: Int,
     isRedeeming: Boolean,
     canRedeem: Boolean,
     onRedeem: () -> Unit

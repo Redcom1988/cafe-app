@@ -102,6 +102,8 @@ class MenuScreenModel(
     }
 
     fun tableNumber(): String = tableSession.getTableNumber()
+    
+    fun hasTrackingToken(): Boolean = tableSession.hasTrackingToken()
 
     fun checkTable() {
         val hasTable = tableSession.hasTable()
