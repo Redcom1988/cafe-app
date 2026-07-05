@@ -1,201 +1,199 @@
 package com.redcom1988.cafej3.screens.profile
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import com.redcom1988.cafej3.R
-import com.redcom1988.cafej3.components.Header
-import com.redcom1988.cafej3.model.UserProfile
-import com.redcom1988.cafej3.theme.*
-import com.redcom1988.cafej3.viewmodel.ProfileViewModel
-import com.redcom1988.cafej3.screens.profile.components.*
+import com.redcom1988.cafej3.components.ErrorDisplay
+import com.redcom1988.cafej3.screens.appsettings.AppSettingsScreen
+import com.redcom1988.cafej3.screens.editprofile.EditProfileScreen
+import com.redcom1988.cafej3.screens.login.LoginScreen
+import com.redcom1988.cafej3.screens.orderhistory.OrderHistoryScreen
 
-object ProfileScreen : Tab {
+data object ProfileScreen : Screen {
 
+    @Suppress("unused")
     private fun readResolve(): Any = ProfileScreen
 
-    override val options: TabOptions
-        @Composable
-        get() {
-            val icon = rememberVectorPainter(Icons.Outlined.PersonOutline)
-            return remember { TabOptions(index = 3u, title = "Profile", icon = icon) }
-        }
-
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = viewModel<ProfileViewModel>()
-        val profile = viewModel.profile.value
+        val screenModel = rememberScreenModel { ProfileScreenModel() }
+        val state by screenModel.state.collectAsState()
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Background)
-        ) {
-                item {
-                    Header()
+        val lifecycle = LocalLifecycleOwner.current.lifecycle
+        DisposableEffect(lifecycle) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    screenModel.refresh()
+                }
+            }
+            lifecycle.addObserver(observer)
+            onDispose { lifecycle.removeObserver(observer) }
+        }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Profile", fontWeight = FontWeight.Bold) },
+                    actions = {
+                        IconButton(onClick = {
+                            screenModel.logout()
+                            navigator.replace(LoginScreen)
+                        }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Log Out",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.background
+        ) { padding ->
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { screenModel.refresh() },
+                modifier = Modifier.fillMaxSize().padding(padding)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp).padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    ProfileCard(profile = profile)
+                    Card(
+                        modifier = Modifier.size(120.dp),
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.Person,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(64.dp)
+                            )
+                        }
+                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    ProfileMenuCard(
-                        icon = { Icon(Icons.Outlined.PersonOutline, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
-                        title = "Edit Profile",
-                        subtitle = "Update your personal information",
-                        onClick = { navigator.push(EditProfileScreen(viewModel)) }
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    ProfileMenuCard(
-                        icon = { Icon(Icons.Outlined.ReceiptLong, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
-                        title = "Order History",
-                        subtitle = "View all past receipts and orders",
-                        onClick = { navigator.push(OrderHistoryScreen) }
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    ProfileMenuCard(
-                        icon = { Icon(Icons.Outlined.Settings, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
-                        title = "App Settings",
-                        subtitle = "Notifications, privacy, and theme",
-                        onClick = {}
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    ProfileMenuCard(
-                        icon = { Icon(Icons.Outlined.HelpOutline, null, tint = Orange2, modifier = Modifier.size(22.dp)) },
-                        title = "Help Center",
-                        subtitle = "Contact support and FAQs",
-                        onClick = {}
-                    )
+                    if (state.isLoading) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    } else if (state.error != null) {
+                        ErrorDisplay(
+                            message = state.error,
+                            onRetry = { screenModel.load() }
+                        )
+                    } else {
+                        Text(
+                            text = state.user?.name ?: "Customer",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                        Text(
+                            text = state.user?.email ?: "",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    LogoutButton(onClick = {})
-
-                    Spacer(modifier = Modifier.height(60.dp))
+                    SettingsRow(Icons.Filled.Person, "Edit Profile", "Update your personal info") {
+                        navigator.push(EditProfileScreen)
+                    }
+                    SettingsRow(Icons.Filled.History, "Order History", "View past orders") {
+                        navigator.push(OrderHistoryScreen)
+                    }
+                    SettingsRow(
+                        Icons.Filled.Settings,
+                        "App Settings",
+                        "Customize your experience"
+                    ) {
+                        navigator.push(AppSettingsScreen)
+                    }
                 }
             }
-        }
-
-    @Composable
-    fun ProfileCard(profile: UserProfile) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 22.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(34.dp))
-                .background(White)
-                .padding(vertical = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.profile2),
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp).clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(Orange2),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Verified, contentDescription = null, tint = White, modifier = Modifier.size(14.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(text = profile.name, color = DarkBrown, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(text = "Member since ${profile.memberSince}", color = SoftBrown, fontSize = 13.sp)
         }
     }
+}
 
-    @Composable
-    fun ProfileMenuCard(
-        icon: @Composable () -> Unit,
-        title: String,
-        subtitle: String,
-        onClick: () -> Unit
+@Composable
+fun SettingsRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 22.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(30.dp))
-                .background(White)
-                .clickable { onClick() }
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Cream),
-                contentAlignment = Alignment.Center
-            ) {
-                icon()
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(24.dp))
+            Column(modifier = Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                Text(text = title, fontWeight = FontWeight.SemiBold)
+                Text(text = subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, color = DarkBrown, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = subtitle, color = SoftBrown, fontSize = 12.sp)
-            }
-            Icon(Icons.Outlined.ArrowForwardIos, contentDescription = null, tint = SoftBrown, modifier = Modifier.size(16.dp))
-        }
-    }
-
-    @Composable
-    fun LogoutButton(onClick: () -> Unit) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 22.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(50.dp))
-                .background(PrimaryOrange)
-                .clickable { onClick() }
-                .padding(vertical = 14.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Outlined.Logout, contentDescription = null, tint = White, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Log Out", color = White, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+            Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

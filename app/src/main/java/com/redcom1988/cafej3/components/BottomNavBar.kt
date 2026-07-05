@@ -1,133 +1,70 @@
 package com.redcom1988.cafej3.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.redcom1988.cafej3.R
-import com.redcom1988.cafej3.screens.home.HomeScreen
-import com.redcom1988.cafej3.screens.order.OrderScreen
-import com.redcom1988.cafej3.screens.profile.ProfileScreen
-import com.redcom1988.cafej3.screens.reward.RewardScreen
-import com.redcom1988.cafej3.theme.*
+
+enum class AppTab { Menu, CartOrder, Rewards, Financial, Profile }
+
+data class BottomNavItem(
+    val label: String,
+    val tab: AppTab,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
+)
+
+fun bottomNavItems(): List<BottomNavItem> = listOf(
+    BottomNavItem("Menu", AppTab.Menu, Icons.Filled.Menu, Icons.Outlined.Menu),
+    BottomNavItem("My Order", AppTab.CartOrder, Icons.Filled.ShoppingCart, Icons.Outlined.ShoppingCart),
+    BottomNavItem("Rewards", AppTab.Rewards, Icons.Filled.Star, Icons.Outlined.Star),
+    BottomNavItem("Profile", AppTab.Profile, Icons.Filled.Person, Icons.Outlined.Person),
+)
 
 @Composable
-fun BottomNavBar(tabNavigator: TabNavigator) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent)
-            .navigationBarsPadding()
-            .padding(horizontal = 10.dp, vertical = 8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(40.dp))
-                .background(backgroundColorNav)
-                .padding(horizontal = 8.dp, vertical = 10.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BottomNavItem(
-                    title = "MENU",
-                    icon = painterResource(id = R.drawable.ic_menu),
-                    selected = tabNavigator.current == HomeScreen,
-                    activeColor = activeColor,
-                    activeBackgroundColor = activeChoosedColor,
-                    inactiveColor = inactiveColor,
-                    onClick = { tabNavigator.current = HomeScreen }
-                )
-                BottomNavItem(
-                    title = "MY ORDER",
-                    icon = painterResource(id = R.drawable.ic_order),
-                    selected = tabNavigator.current == OrderScreen,
-                    activeColor = activeColor,
-                    activeBackgroundColor = activeChoosedColor,
-                    inactiveColor = inactiveColor,
-                    onClick = { tabNavigator.current = OrderScreen }
-                )
-                BottomNavItem(
-                    title = "REWARDS",
-                    icon = painterResource(id = R.drawable.ic_rewards),
-                    selected = tabNavigator.current == RewardScreen,
-                    activeColor = activeColor,
-                    activeBackgroundColor = activeChoosedColor,
-                    inactiveColor = inactiveColor,
-                    onClick = { tabNavigator.current = RewardScreen }
-                )
-                BottomNavItem(
-                    title = "PROFILE",
-                    icon = painterResource(id = R.drawable.ic_profile),
-                    selected = tabNavigator.current == ProfileScreen,
-                    activeColor = activeColor,
-                    activeBackgroundColor = activeChoosedColor,
-                    inactiveColor = inactiveColor,
-                    onClick = { tabNavigator.current = ProfileScreen }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomNavItem(
-    title: String,
-    icon: Painter,
-    selected: Boolean,
-    activeColor: Color,
-    activeBackgroundColor: Color,
-    inactiveColor: Color,
-    onClick: () -> Unit
+fun BottomNavBar(
+    items: List<BottomNavItem>,
+    currentTab: AppTab,
+    onTabSelected: (AppTab) -> Unit
 ) {
-    val contentColor = if (selected) activeColor else inactiveColor
-    val fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-    val fontSize = if (selected) 11.sp else 10.sp
-
-    val itemBackground = if (selected) activeBackgroundColor else Color.Transparent
-
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(28.dp))
-            .background(itemBackground)
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = title,
-            tint = contentColor,
-            modifier = Modifier.size(22.dp)
-        )
-        Text(
-            text = title,
-            color = contentColor,
-            fontSize = fontSize,
-            fontWeight = fontWeight
-        )
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+        items.forEach { item ->
+            val selected = currentTab == item.tab
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onTabSelected(item.tab) },
+                icon = {
+                    Icon(
+                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                        contentDescription = item.label,
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = { Text(text = item.label) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
     }
 }

@@ -2,29 +2,50 @@ package com.redcom1988.cafej3.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Background = Color(0xFFF1E5D8)
+// Brown — primary (coffee brown, buttons, primary actions)
+val BrownDark = Color(0xFF4A1B00)
+val Brown = Color(0xFF7F4E2D)
+val BrownLight = Color(0xFFD6B89C)
+val BrownPale = Color(0xFFF0DCCB)
 
-val PrimaryOrange = Color(0xFF9E3D00)
-val Orange2 = Color(0xFFC64F00)
-val Orange3 = Color(0xFFD35400)
+// Terracotta — secondary (accent, cocktail/drink tags)
+val TerracottaDark = Color(0xFF44230A)
+val Terracotta = Color(0xFFB85C3A)
+val TerracottaLight = Color(0xFFF0BFA5)
+val TerracottaPale = Color(0xFFF8DCCE)
 
-val DarkBrown = Color(0xFF1E1B13)
-val SoftBrown = Color(0xFF594238)
+// Clay — tertiary (dessert/warm accent)
+val ClayDark = Color(0xFF4C1C00)
+val Clay = Color(0xFFA8683E)
+val ClayLight = Color(0xFFE8C4A8)
+val ClayPale = Color(0xFFF3DDCD)
 
-val Cream = Color(0xFFEFE7D9)
+// Cream — backgrounds and surfaces
+val CreamDarkest = Color(0xFF1E130D)
+val CreamDark = Color(0xFF332218)
+val CreamPale = Color(0xFFFFF0E0)
+val CreamLight = Color(0xFFFFF8F0)
 
-val White = Color(0xFFFFFFFF)
+// Taupe — neutral outlines / muted text
+val TaupeDark = Color(0xFF534438)
+val Taupe = Color(0xFF8C7B6E)
+val TaupeLight = Color(0xFFC4B5A8)
 
-val PinkSoft = Color(0xFFFFDBCD)
-val PinkSoft2 = Color(0xFFFFDCC5)
+// Error / expense
+val ExpenseRedDark = Color(0xFF690004)
+val ExpenseRed = Color(0xFFBA1A1A)
+val ExpenseRedContainerLight = Color(0xFFFFDAD4)
+val ExpenseRedContainerDark = ExpenseRedDark
+val ErrorLight = Color(0xFFFFB4A8)
 
-val backgroundColor = Color(0xFFFBF3E4)
-val brownPrimary = Color(0xFF9E3D00)
-val brownDark = Color(0xFF574239)
-val grayText = Color(0xFFA8A29E)
-val softPink = Color(0xFFF3DED6)
-val inputColor = Color(0xFFE9E2D3)
-val backgroundColorNav = Color(0xFFFFFFFF)
-val activeChoosedColor = Color(0xFFD35400)
-val activeColor = Color(0xFFFFFFFF)
-val inactiveColor = Color(0xFF707070)
+// Misc / semantic
+val IncomeGreen = Color(0xFF2E7D32)
+val BadgeDarkBg = Color(0xCC1A1C1E)
+val PriceBadgeBg = Color(0xFFFFF8F0)
+val ShadowColor = Color(0x1A000000)
+val IconChipBg = Color(0xFFF0DCCB)
+val MutedTaupe = Color(0xFFA8988A)
+val SurfaceWhite = Color(0xFFFFFFFF)
+val CreamBackground = Color(0xFFFFF8F0)
+val CoffeeBrown = Color(0xFF7F4E2D)
+val TerracottaAccent = Color(0xFFB85C3A)

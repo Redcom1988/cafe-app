@@ -39,6 +39,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -49,6 +55,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,6 +67,7 @@ dependencies {
     implementation(libs.material.icons)
     implementation(libs.material.motion.compose.core)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
     implementation(libs.voyager.navigator)
     implementation(libs.voyager.tabNavigator)
@@ -72,11 +80,11 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
     implementation(project(":data"))
-    implementation("androidx.camera:camera-core:1.6.1")
-    implementation("androidx.camera:camera-camera2:1.6.1")
-    implementation("androidx.camera:camera-lifecycle:1.6.1")
-    implementation("androidx.camera:camera-view:1.6.1")
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
-    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation(libs.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.accompanist.permissions)
 }
