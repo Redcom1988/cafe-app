@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 class GetPointHistory(
     private val pointRepository: PointRepository
 ) {
-    suspend fun await(userId: Int): List<Point> = withContext(Dispatchers.IO) {
-        pointRepository.getHistory(userId)
+    suspend fun await(): List<Point> = withContext(Dispatchers.IO) {
+        pointRepository.getHistory()
     }
 }

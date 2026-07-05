@@ -21,14 +21,14 @@ class OfferRepositoryImpl(
         return response.parseAs<List<OfferResponse>>().map { it.toDomain() }
     }
 
-    override suspend fun redeemOffer(userId: Int, offerId: Int): UserOffer {
-        val response = api.redeemOffer(RedeemOfferRequest(userId, offerId))
+    override suspend fun redeemOffer(offerId: Int): UserOffer {
+        val response = api.redeemOffer(RedeemOfferRequest(offerId))
         if (!response.isSuccessful) throw Exception("Failed to redeem offer (HTTP ${response.code})")
         return response.parseAs<UserOfferResponse>().toDomain()
     }
 
-    override suspend fun getUserOffers(userId: Int): List<UserOffer> {
-        val response = api.getUserOffers(userId)
+    override suspend fun getUserOffers(): List<UserOffer> {
+        val response = api.getUserOffers()
         if (!response.isSuccessful) throw Exception("Failed to fetch user offers (HTTP ${response.code})")
         return response.parseAs<List<UserOfferResponse>>().map { it.toDomain() }
     }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 class RedeemOffer(
     private val offerRepository: OfferRepository
 ) {
-    suspend fun await(userId: Int, offerId: Int): UserOffer = withContext(Dispatchers.IO) {
-        offerRepository.redeemOffer(userId, offerId)
+    suspend fun await(offerId: Int): UserOffer = withContext(Dispatchers.IO) {
+        offerRepository.redeemOffer(offerId)
     }
 }

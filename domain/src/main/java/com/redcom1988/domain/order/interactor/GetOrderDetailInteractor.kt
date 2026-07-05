@@ -11,4 +11,8 @@ class GetOrderDetail(
     suspend fun await(id: Int): Order = withContext(Dispatchers.IO) {
         orderRepository.getOrderDetail(id)
     }
+
+    suspend fun trackGuest(id: Int, trackingToken: String): Order = withContext(Dispatchers.IO) {
+        orderRepository.getGuestOrderDetail(id, trackingToken)
+    }
 }

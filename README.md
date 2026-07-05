@@ -1,120 +1,123 @@
-# Android Starter
+# Cafe Jasjisjus — Android App
 
-A clean, modular Android project template to kickstart your next Android application. This starter template comes with a multi-module architecture and an easy setup script to customize it for your project.
+Android frontend for **Aplikasi Digitalisasi Layanan Cafe Jasjisjus**.
 
-## 🏗️ Architecture
+Built with **Kotlin**, **Jetpack Compose**, **Voyager** (navigation), **Ktor** (networking), **Socket.IO** (realtime), and **Clean Architecture** (multi-module).
 
-This project follows a clean, modular architecture with the following modules:
+## Tech Stack
 
-- **`app`** - Main application module containing UI and application-specific code
-- **`core`** - Core utilities, extensions, and shared functionality
-- **`domain`** - Business logic and use cases
-- **`data`** - Data sources, repositories, and data management
+- **Language:** Kotlin
+- **UI:** Jetpack Compose, Material3
+- **Navigation:** Voyager (TabNavigator + Navigator)
+- **Networking:** Ktor + OkHttp
+- **Realtime:** Socket.IO
+- **Architecture:** Clean Architecture (multi-module)
+- **Image Loading:** Coil
+- **Serialization:** kotlinx.serialization
 
-## 🚀 Quick Start
+## Project Structure
 
-### Option 1: Use template and setup via workflow
-1. Click the button **`"Use this template"`** and create new repository
+```
+cafe-app/
+├── app/          # Main application module (UI, screens, navigation)
+├── core/         # Core utilities, extensions, shared components
+├── domain/       # Business logic, models, interactors, repositories
+└── data/         # Data sources, API, DTOs, mappers
+```
 
-<img width="171" height="101" alt="image" src="https://github.com/user-attachments/assets/7387fc21-1dde-4308-9824-c9340e59ddfa" />
+### Modules
 
-2. Name your repository
-  
-3. Go to the **`"Actions"`** tab
+| Module | Responsibility |
+|---|---|
+| `app` | Compose screens, navigation, ViewModel/ScreenModel, DI |
+| `core` | Common utilities, extensions, theme, components |
+| `domain` | Use cases (`CancelOrder`, `CreateOrder`, `PayOrder`), domain models, repository interfaces |
+| `data` | API definitions (`Cafej3Api`), DTOs, repository implementations, mappers |
 
-<img width="97" height="42" alt="image" src="https://github.com/user-attachments/assets/203ece94-0762-4f20-971a-c32706ddf026" />
+## Features
 
-4. Select **`Setup Project`**
+- Menu browsing with category filtering
+- Cart management with item note support
+- Order creation (guest + authenticated) — includes optional `userOfferId` for instant discount
+- Doku payment via WebView
+- Realtime order tracking (Socket.IO)
+- Order history with cancellation reason display
+- Rewards & points (redeem offers, points history)
+- Dedicated offer selection screen (grouped by type, shows count)
+- Cart price breakdown (subtotal, discount, total after discount)
+- QR table scanning
+- Guest order tracking with secure token
+- Active order status polling (30s interval)
+- Profile auto-refresh after editing
 
-<img width="327" height="169" alt="image" src="https://github.com/user-attachments/assets/734286cd-b09e-41c4-94b6-be1ec136bbb4" />
+## Key Implementation Details
 
-5. Run workflow with your input
+### Navigator Pattern (Mihon-style)
 
-<img width="355" height="401" alt="image" src="https://github.com/user-attachments/assets/597aae9e-4bfa-4305-b935-9813603f9c0f" />
+Root `Navigator` is captured *before* `TabNavigator` and provided via `CompositionLocalProvider` inside the tab navigator lambda. This allows tab content screens to push to the root navigator (not the tab navigator's internal one), preventing `ClassCastException`.
 
-### Option 2: Manual Setup
+### Order Refresh on Return
 
-You can run the setup script in two ways:
+Uses `DisposableEffect` + `LifecycleEventObserver` + `ON_RESUME` to refresh order data when returning from the payment WebView (since Voyager 1.1.0-beta03 has no `popWithResult`). Same pattern used for profile refresh after edit.
 
-#### Interactive Mode
+### Offer Selection Communication
+
+Screens communicate selected offer via `OfferSelectionStore` singleton. `OfferSelectionScreen` stores the picked `userOfferId`, and `CartScreenModel.loadUserOffers()` picks it up on resume.
+
+### Offer Applied Before Payment
+
+When creating an order with `userOfferId`, the offer is applied on the backend **before** the Doku payment URL is generated — so the payment amount reflects the discounted price.
+
+### Cart Price Breakdown
+
+New Order tab shows subtotal, discount (calculated client-side as estimate from `discountType`/`discountRate`/`maxDiscount`), and total after discount when an offer is selected.
+
+### Cancellation Reason Display
+
+When `order.status == "CANCELLED"` and `order.cancellationReason` is set, the reason is displayed in red below the status in both `ActiveOrderContent` and `OrderCard`.
+
+### Points History
+
+- `RewardsScreen` shows 3 latest entries with "See all" link
+- `PointsHistoryScreen` shows full list (no detail screen)
+- Canceled orders with applied offers return the `UserOffer` to `AVAILABLE`
+
+### Date Formatting
+
+`DateUtils.formatDateTime()` converts ISO 8601 strings (e.g. `2026-07-05T04:44:03.051Z`) to `dd MMM yyyy, HH:mm` in device local timezone.
+
+## Setup
+
 ```bash
-chmod +x setup.sh
-./setup.sh
+# Open in Android Studio
+# Sync Gradle
+# Run on emulator or device
 ```
 
-The setup script will prompt you for:
+The app connects to `BASE_URL` from BuildConfig (debug: `http://100.108.202.107:3000` via Tailscale, release: production Railway URL).
 
-- **Project Name**: The display name of your project (e.g., "My Awesome App")
-- **Package Name**: The main package name for your app module (e.g., "com.company.myapp")
-- **Minimum SDK**: The minimum Android SDK version (default: 26)
+## Screens
 
-**Examples:**
-```bash
-Project Name: (Android Starter) My Awesome App
-Package Name: (com.example.androidstarter) com.company.myapp
-Minimum SDK Version: (26) 24
-```
+| Screen | File | Description |
+|---|---|---|
+| Cart/New Order | `screens/cart/CartOrderScreen.kt` | Cart, order tabs, offer selection, price breakdown, payment |
+| CartScreenModel | `screens/cart/CartScreenModel.kt` | Order flow, offer selection, payment initiation |
+| OfferSelectionScreen | `screens/cart/OfferSelectionScreen.kt` | Dedicated offer picker with grouping and counts |
+| RewardsScreen | `screens/rewards/RewardsScreen.kt` | Balance card, available rewards, 3 latest points |
+| PointsHistoryScreen | `screens/rewards/PointsHistoryScreen.kt` | Full points history list |
+| OrderHistoryScreen | `screens/orderhistory/OrderHistoryScreen.kt` | Previous orders list with cancellation reason |
+| OrderHistoryDetailScreen | `screens/orderhistory/OrderHistoryDetailScreen.kt` | Order detail (reuses ActiveOrderContent) |
+| ProfileScreen | `screens/profile/ProfileScreen.kt` | User profile with auto-refresh on resume |
+| MenuScreen | `screens/menu/MenuScreen.kt` | Category-filtered menu items |
 
-#### Command Line Mode
-```bash
-chmod +x setup.sh
-./setup.sh --name "My Awesome App" --package com.company.myapp --sdk 24 --yes
-```
+## Dependencies (key)
 
-The script will prompt you for each configuration option.
-
-**Command line options:**
-- `-n, --name PROJECT_NAME` - Set the project name
-- `-p, --package PACKAGE_NAME` - Set the package name (for app module)
-- `-s, --sdk MIN_SDK` - Set the minimum SDK version
-- `-y, --yes` - Skip confirmation prompt
-- `-h, --help` - Show help message
-
-**Examples:**
-```bash
-# Full setup with confirmation
-./setup.sh --name "My App" --package com.company.myapp --sdk 26
-
-# Quick setup without confirmation
-./setup.sh -n "My App" -p com.company.myapp -s 24 -y
-
-# Use some defaults
-./setup.sh --package com.company.myapp --yes
-```
-
-This will configure your project with:
-- App module package: `com.company.myapp`
-- Core module package: `com.company.core`
-- Domain module package: `com.company.domain`
-- Data module package: `com.company.data`
-
-## 📁 Project Structure
-
-After setup, your project structure will look like this:
-
-```
-android-starter/
-├── app/                          # Main application module
-│   ├── src/main/java/your/package/name/
-│   └── build.gradle
-├── core/                         # Core utilities module
-│   ├── src/main/java/your/package/core/
-│   └── build.gradle
-├── domain/                       # Business logic module
-│   ├── src/main/java/your/package/domain/
-│   └── build.gradle
-├── data/                         # Data layer module
-│   ├── src/main/java/your/package/data/
-│   └── build.gradle
-├── build.gradle
-├── settings.gradle
-└── setup.sh
-```
-
-## 🤝 Contributing
-
-Feel free to submit issues and pull requests to improve this starter template!
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+| Library | Purpose |
+|---|---|
+| Voyager | Screen-based navigation, TabNavigator |
+| Ktor Client | HTTP networking |
+| Socket.IO | Realtime order updates |
+| Coil | Image loading |
+| kotlinx.serialization | JSON serialization |
+| Compose Material3 | UI components |
+| DataStore | Local preferences |

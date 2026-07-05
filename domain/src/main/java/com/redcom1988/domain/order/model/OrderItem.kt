@@ -6,5 +6,7 @@ data class OrderItem(
     val quantity: Int,
     val itemPriceAtOrder: String,
     val subtotal: String,
-    val note: String? = null
+    val note: String? = null,
+    val menuItemName: String? = null,
+    val unitStatuses: List<String> = emptyList()
 )

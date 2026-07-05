@@ -6,6 +6,7 @@ import com.redcom1988.data.remote.mapper.toDomain
 import com.redcom1988.data.remote.model.auth.LoginRequest
 import com.redcom1988.data.remote.model.auth.LoginResponse
 import com.redcom1988.data.remote.model.auth.RegisterRequest
+import com.redcom1988.data.remote.model.auth.UpdateProfileRequest
 import com.redcom1988.data.remote.model.auth.UserResponse
 import com.redcom1988.domain.auth.model.AuthToken
 import com.redcom1988.domain.auth.model.User
@@ -35,6 +36,12 @@ class AuthRepositoryImpl(
     override suspend fun getMe(): User {
         val response = api.me()
         if (!response.isSuccessful) throw Exception("Failed to get profile (HTTP ${response.code})")
+        return response.parseAs<UserResponse>().toDomain()
+    }
+
+    override suspend fun updateProfile(name: String?, username: String?, email: String?, phoneNumber: String?): User {
+        val response = api.updateProfile(UpdateProfileRequest(name, username, email, phoneNumber))
+        if (!response.isSuccessful) throw Exception("Failed to update profile (HTTP ${response.code})")
         return response.parseAs<UserResponse>().toDomain()
     }
 }

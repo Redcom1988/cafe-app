@@ -1,4 +1,4 @@
-package com.redcom1988.cafej3.di
+package com.redcom1988.data.di
 
 import com.redcom1988.data.remote.Cafej3Api
 import com.redcom1988.data.repository.AnalyticsRepositoryImpl

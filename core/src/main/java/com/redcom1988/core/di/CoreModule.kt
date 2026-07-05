@@ -1,4 +1,4 @@
-package com.redcom1988.cafej3.di
+package com.redcom1988.core.di
 
 import android.content.Context
 import com.redcom1988.core.network.NetworkHelper
@@ -25,6 +25,3 @@ val coreModule = module {
         )
     }
 }
-
-
-

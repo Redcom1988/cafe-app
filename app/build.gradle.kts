@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,4 +77,16 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
     implementation(project(":data"))
+
+    // CameraX
+    implementation("androidx.camera:camera-core:1.6.1")
+    implementation("androidx.camera:camera-camera2:1.6.1")
+    implementation("androidx.camera:camera-lifecycle:1.6.1")
+    implementation("androidx.camera:camera-view:1.6.1")
+
+    // MLKit barcode scanning
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
+    // Accompanist permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
 }

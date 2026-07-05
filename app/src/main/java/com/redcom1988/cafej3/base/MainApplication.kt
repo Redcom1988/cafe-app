@@ -2,8 +2,8 @@ package com.redcom1988.cafej3.base
 
 import android.app.Application
 import android.util.Log
-import com.redcom1988.cafej3.di.coreModule
-import com.redcom1988.cafej3.di.dataModule
+import com.redcom1988.core.di.coreModule
+import com.redcom1988.data.di.dataModule
 import com.redcom1988.cafej3.di.domainModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin

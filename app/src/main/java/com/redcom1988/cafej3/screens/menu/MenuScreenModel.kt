@@ -7,6 +7,7 @@ import com.redcom1988.domain.menu.interactor.GetCategories
 import com.redcom1988.domain.menu.interactor.GetMenuItems
 import com.redcom1988.domain.menu.model.MenuCategory
 import com.redcom1988.domain.menu.model.MenuItem
+import com.redcom1988.domain.table.interactor.TableSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,12 +20,15 @@ data class MenuUiState(
     val searchQuery: String = "",
     val isSearchActive: Boolean = false,
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val hasTable: Boolean = true,
     val error: String? = null
 )
 
 class MenuScreenModel(
     private val getCategories: GetCategories = inject(),
-    private val getMenuItems: GetMenuItems = inject()
+    private val getMenuItems: GetMenuItems = inject(),
+    private val tableSession: TableSession = inject()
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(MenuUiState())
@@ -33,7 +37,31 @@ class MenuScreenModel(
     private var allItems: List<MenuItem> = emptyList()
 
     init {
+        _state.value = _state.value.copy(
+            hasTable = tableSession.hasTable()
+        )
         load()
+    }
+
+    fun refresh() {
+        screenModelScope.launch {
+            _state.value = _state.value.copy(isRefreshing = true, error = null)
+            try {
+                val categories = getCategories.await()
+                val items = getMenuItems.await()
+                allItems = items
+                _state.value = _state.value.copy(
+                    categories = categories,
+                    items = items,
+                    isRefreshing = false
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isRefreshing = false,
+                    error = e.message
+                )
+            }
+        }
     }
 
     fun load() {
@@ -58,16 +86,8 @@ class MenuScreenModel(
     }
 
     fun selectCategory(categoryId: Int?) {
-        _state.value = _state.value.copy(selectedCategoryId = categoryId, isLoading = true, error = null)
-        screenModelScope.launch {
-            try {
-                val items = getMenuItems.await(categoryId = categoryId)
-                allItems = items
-                applyFilters()
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(isLoading = false, error = e.message)
-            }
-        }
+        _state.value = _state.value.copy(selectedCategoryId = categoryId)
+        applyFilters()
     }
 
     fun toggleSearch() {
@@ -81,9 +101,22 @@ class MenuScreenModel(
         applyFilters()
     }
 
+    fun tableNumber(): String = tableSession.getTableNumber()
+
+    fun checkTable() {
+        val hasTable = tableSession.hasTable()
+        if (hasTable != _state.value.hasTable) {
+            _state.value = _state.value.copy(hasTable = hasTable)
+            if (hasTable && allItems.isEmpty()) load()
+        }
+    }
+
     private fun applyFilters() {
         val s = _state.value
         var filtered = allItems
+        if (s.selectedCategoryId != null) {
+            filtered = filtered.filter { it.categoryId == s.selectedCategoryId }
+        }
         val query = s.searchQuery.trim().lowercase()
         if (query.isNotBlank()) {
             filtered = filtered.filter {

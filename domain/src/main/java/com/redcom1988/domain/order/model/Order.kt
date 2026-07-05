@@ -5,8 +5,11 @@ data class Order(
     val orderCode: String,
     val customerName: String? = null,
     val status: String,
+    val payment: Payment? = null,
     val totalPrice: String,
     val finalPrice: String,
     val items: List<OrderItem>,
-    val createdAt: String? = null
+    val createdAt: String? = null,
+    val trackingToken: String? = null,
+    val cancellationReason: String? = null
 )

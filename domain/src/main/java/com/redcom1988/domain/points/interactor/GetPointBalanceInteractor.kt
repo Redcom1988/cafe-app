@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 class GetPointBalance(
     private val pointRepository: PointRepository
 ) {
-    suspend fun await(userId: Int): Int = withContext(Dispatchers.IO) {
-        pointRepository.getBalance(userId)
+    suspend fun await(): Int = withContext(Dispatchers.IO) {
+        pointRepository.getBalance()
     }
 }

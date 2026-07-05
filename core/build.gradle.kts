@@ -7,6 +7,10 @@ android {
     namespace = "com.redcom1988.core"
     compileSdk = 36
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdk = 26
 

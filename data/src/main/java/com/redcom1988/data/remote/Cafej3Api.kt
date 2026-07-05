@@ -9,10 +9,12 @@ import com.redcom1988.core.network.await
 import com.redcom1988.core.network.json
 import com.redcom1988.data.remote.model.auth.LoginRequest
 import com.redcom1988.data.remote.model.auth.RegisterRequest
+import com.redcom1988.data.remote.model.auth.UpdateProfileRequest
 import com.redcom1988.data.remote.model.offer.ApplyOfferRequest
 import com.redcom1988.data.remote.model.offer.RedeemOfferRequest
 import com.redcom1988.data.remote.model.order.CreateOrderRequest
 import com.redcom1988.data.remote.model.order.UpdateOrderStatusRequest
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
@@ -43,6 +45,13 @@ class Cafej3Api(
     suspend fun me(): Response {
         return networkHelper.client.newCall(
             GET(url = "$baseUrl/auth/me")
+        ).await()
+    }
+
+    // ── Users ──
+    suspend fun updateProfile(request: UpdateProfileRequest): Response {
+        return networkHelper.client.newCall(
+            PATCH(url = "$baseUrl/users/me/profile", body = jsonBody(request))
         ).await()
     }
 
@@ -86,6 +95,19 @@ class Cafej3Api(
         ).await()
     }
 
+    suspend fun createAuthenticatedOrder(request: CreateOrderRequest): Response {
+        return networkHelper.client.newCall(
+            POST(url = "$baseUrl/orders/me", body = jsonBody(request))
+        ).await()
+    }
+
+    suspend fun trackGuestOrder(id: Int, trackingToken: String): Response {
+        val headers = Headers.Builder().add("X-Tracking-Token", trackingToken).build()
+        return networkHelper.client.newCall(
+            GET(url = "$baseUrl/orders/$id/track", headers = headers)
+        ).await()
+    }
+
     suspend fun getOrders(status: String? = null): Response {
         val url = if (status != null) "$baseUrl/orders?status=$status" else "$baseUrl/orders"
         return networkHelper.client.newCall(GET(url = url)).await()
@@ -97,15 +119,32 @@ class Cafej3Api(
         ).await()
     }
 
-    suspend fun getMyOrders(userId: Int): Response {
+    suspend fun getMyOrders(): Response {
         return networkHelper.client.newCall(
-            GET(url = "$baseUrl/orders/my-orders?userId=$userId")
+            GET(url = "$baseUrl/orders/my-orders")
         ).await()
     }
 
     suspend fun getOrderDetail(id: Int): Response {
         return networkHelper.client.newCall(
             GET(url = "$baseUrl/orders/$id")
+        ).await()
+    }
+
+    suspend fun confirmPayment(id: Int): Response {
+        return networkHelper.client.newCall(
+            POST(url = "$baseUrl/orders/$id/pay")
+        ).await()
+    }
+
+    suspend fun cancelOrder(id: Int, trackingToken: String? = null): Response {
+        val headers = if (trackingToken != null) {
+            Headers.Builder().add("X-Tracking-Token", trackingToken).build()
+        } else {
+            Headers.Builder().build()
+        }
+        return networkHelper.client.newCall(
+            POST(url = "$baseUrl/orders/$id/cancel", headers = headers)
         ).await()
     }
 
@@ -123,15 +162,15 @@ class Cafej3Api(
     }
 
     // ── Points ──
-    suspend fun getPointBalance(userId: Int): Response {
+    suspend fun getPointBalance(): Response {
         return networkHelper.client.newCall(
-            GET(url = "$baseUrl/points/balance?userId=$userId")
+            GET(url = "$baseUrl/points/balance")
         ).await()
     }
 
-    suspend fun getPointHistory(userId: Int): Response {
+    suspend fun getPointHistory(): Response {
         return networkHelper.client.newCall(
-            GET(url = "$baseUrl/points/history?userId=$userId")
+            GET(url = "$baseUrl/points/history")
         ).await()
     }
 
@@ -148,9 +187,9 @@ class Cafej3Api(
         ).await()
     }
 
-    suspend fun getUserOffers(userId: Int): Response {
+    suspend fun getUserOffers(): Response {
         return networkHelper.client.newCall(
-            GET(url = "$baseUrl/user-offers?userId=$userId")
+            GET(url = "$baseUrl/user-offers")
         ).await()
     }
 

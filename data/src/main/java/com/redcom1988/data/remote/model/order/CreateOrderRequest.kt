@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateOrderRequest(
     val tableId: Int? = null,
-    val userId: Int? = null,
     val customerName: String? = null,
+    val userOfferId: Int? = null,
     val items: List<OrderItemRequest>
 )
 

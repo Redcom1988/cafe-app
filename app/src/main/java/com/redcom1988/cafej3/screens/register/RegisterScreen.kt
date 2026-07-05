@@ -30,7 +30,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.redcom1988.cafej3.screens.main.MainScreen
 import com.redcom1988.cafej3.components.PrimaryButton
 
 data object RegisterScreen : Screen {
@@ -141,7 +140,7 @@ data object RegisterScreen : Screen {
             if (!state.error.isNullOrBlank()) {
                 Text(
                     text = state.error ?: "",
-                    color = Color.Red,
+                    color = MaterialTheme.colorScheme.error,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -151,7 +150,7 @@ data object RegisterScreen : Screen {
                 text = if (state.isLoading) "Creating Account..." else "Create Account",
                 onClick = {
                     screenModel.submit {
-                        navigator.replace(MainScreen)
+                        navigator.pop()
                     }
                 },
                 enabled = !state.isLoading &&
@@ -179,6 +178,7 @@ private fun FieldLabel(text: String) {
     Text(
         text = text,
         fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
     )
 }
@@ -187,5 +187,7 @@ private fun FieldLabel(text: String) {
 private fun fieldColors() = OutlinedTextFieldDefaults.colors(
     unfocusedBorderColor = Color.Transparent,
     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
 )

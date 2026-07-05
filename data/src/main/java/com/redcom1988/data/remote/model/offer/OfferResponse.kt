@@ -16,7 +16,6 @@ data class OfferResponse(
 
 @Serializable
 data class RedeemOfferRequest(
-    val userId: Int,
     val offerId: Int
 )
 

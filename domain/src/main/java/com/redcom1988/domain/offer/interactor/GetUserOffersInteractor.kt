@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 class GetUserOffers(
     private val offerRepository: OfferRepository
 ) {
-    suspend fun await(userId: Int): List<UserOffer> = withContext(Dispatchers.IO) {
-        offerRepository.getUserOffers(userId)
+    suspend fun await(): List<UserOffer> = withContext(Dispatchers.IO) {
+        offerRepository.getUserOffers()
     }
 }

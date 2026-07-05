@@ -1,8 +1,11 @@
 package com.redcom1988.cafej3.screens.orderhistory
 
+import com.redcom1988.core.util.formatDateTime
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import com.redcom1988.cafej3.components.ErrorDisplay
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.redcom1988.domain.order.model.Order
@@ -67,47 +72,52 @@ data object OrderHistoryScreen : Screen {
             },
             containerColor = MaterialTheme.colorScheme.background
         ) { padding ->
-            Column(
-                modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)
-            ) {
-                if (state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+            } else if (state.error != null && state.orders.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    ErrorDisplay(
+                        message = state.error,
+                        onRetry = { screenModel.load() }
+                    )
+                }
+            } else if (state.orders.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "No completed orders",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Active orders can be viewed in My Order",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp
+                        )
                     }
-                    return@Column
                 }
-
-                if (state.error != null) {
-                    Text("Error: ${state.error}", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 32.dp))
-                    return@Column
-                }
-
-                if (state.orders.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+            } else {
+                PullToRefreshBox(
+                    isRefreshing = state.isRefreshing,
+                    onRefresh = { screenModel.refresh() },
+                    modifier = Modifier.fillMaxSize().padding(padding)
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "No orders yet",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Try making an order from the menu",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                fontSize = 14.sp
+                        items(state.orders) { order ->
+                            OrderCard(
+                                order = order,
+                                onTrackOrder = { navigator.push(OrderHistoryDetailScreen(order.id)) }
                             )
                         }
-                    }
-                    return@Column
-                }
-
-                LazyColumn {
-                    items(state.orders) { order ->
-                        OrderCard(order)
                     }
                 }
             }
@@ -116,7 +126,7 @@ data object OrderHistoryScreen : Screen {
 }
 
 @Composable
-private fun OrderCard(order: Order) {
+private fun OrderCard(order: Order, onTrackOrder: () -> Unit) {
     val statusColor = when (order.status) {
         "PENDING" -> Color(0xFFF59E0B)
         "PREPARING" -> Color(0xFF3B82F6)
@@ -127,7 +137,7 @@ private fun OrderCard(order: Order) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { onTrackOrder() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(1.dp)
@@ -146,13 +156,23 @@ private fun OrderCard(order: Order) {
                     fontSize = 12.sp
                 )
             }
+            val cancelReason = order.cancellationReason
+            if (order.status == "CANCELLED" && cancelReason != null) {
+                Text(
+                    text = cancelReason,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
             Spacer(modifier = Modifier.height(4.dp))
             order.customerName?.let {
                 Text(text = it, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
             }
             Spacer(modifier = Modifier.height(4.dp))
-            order.createdAt?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            val createdAt = formatDateTime(order.createdAt)
+            if (createdAt != null) {
+                Text(text = createdAt, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(

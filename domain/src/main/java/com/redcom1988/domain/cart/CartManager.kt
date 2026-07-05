@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -34,13 +33,7 @@ class CartManager(
         }.toString()
     }.stateIn(scope, SharingStarted.WhileSubscribed(5000), "0")
 
-    val tax: StateFlow<String> = subtotal.map {
-        ((it.toLongOrNull() ?: 0L) * 85 / 1000).toString()
-    }.stateIn(scope, SharingStarted.WhileSubscribed(5000), "0")
-
-    val total: StateFlow<String> = combine(subtotal, tax) { s, t ->
-        ((s.toLongOrNull() ?: 0L) + (t.toLongOrNull() ?: 0L)).toString()
-    }.stateIn(scope, SharingStarted.WhileSubscribed(5000), "0")
+    val total: StateFlow<String> = subtotal
 
     init {
         loadPersisted()

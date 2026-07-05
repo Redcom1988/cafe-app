@@ -12,14 +12,14 @@ class PointRepositoryImpl(
     private val api: Cafej3Api
 ) : PointRepository {
 
-    override suspend fun getBalance(userId: Int): Int {
-        val response = api.getPointBalance(userId)
+    override suspend fun getBalance(): Int {
+        val response = api.getPointBalance()
         if (!response.isSuccessful) throw Exception("Failed to fetch balance (HTTP ${response.code})")
         return response.parseAs<PointBalanceResponse>().balance
     }
 
-    override suspend fun getHistory(userId: Int): List<Point> {
-        val response = api.getPointHistory(userId)
+    override suspend fun getHistory(): List<Point> {
+        val response = api.getPointHistory()
         if (!response.isSuccessful) throw Exception("Failed to fetch points history (HTTP ${response.code})")
         return response.parseAs<List<PointResponse>>().map { it.toDomain() }
     }

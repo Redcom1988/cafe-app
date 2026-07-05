@@ -1,4 +1,4 @@
-package com.redcom1988.cafej3.screens.signin
+package com.redcom1988.cafej3.screens.login
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -9,19 +9,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-data class SignInUiState(
+data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
-class SignInScreenModel(
+class LoginScreenModel(
     private val login: Login = inject()
 ) : ScreenModel {
 
-    private val _state = MutableStateFlow(SignInUiState())
-    val state: StateFlow<SignInUiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(LoginUiState())
+    val state: StateFlow<LoginUiState> = _state.asStateFlow()
 
     fun onEmailChange(email: String) {
         _state.value = _state.value.copy(email = email, error = null)

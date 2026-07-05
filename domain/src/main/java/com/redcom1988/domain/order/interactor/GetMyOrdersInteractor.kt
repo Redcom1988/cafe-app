@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 class GetMyOrders(
     private val orderRepository: OrderRepository
 ) {
-    suspend fun await(userId: Int): List<Order> = withContext(Dispatchers.IO) {
-        orderRepository.getMyOrders(userId)
+    suspend fun await(): List<Order> = withContext(Dispatchers.IO) {
+        orderRepository.getMyOrders()
     }
 }

@@ -10,10 +10,9 @@ class CreateOrder(
 ) {
     suspend fun await(
         tableId: Int? = null,
-        userId: Int? = null,
         customerName: String? = null,
         items: List<Pair<Int, Int>>
     ): Order = withContext(Dispatchers.IO) {
-        orderRepository.createOrder(tableId, userId, customerName, items)
+        orderRepository.createOrder(tableId, customerName, items)
     }
 }

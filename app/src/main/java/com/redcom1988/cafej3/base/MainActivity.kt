@@ -18,7 +18,7 @@ import cafe.adriel.voyager.navigator.NavigatorDisposeBehavior
 import cafe.adriel.voyager.transitions.ScreenTransition
 import com.redcom1988.cafej3.screens.main.MainScreen
 import com.redcom1988.cafej3.theme.AppTheme
-import com.redcom1988.cafej3.screens.signin.SignInScreen
+import com.redcom1988.cafej3.screens.login.LoginScreen
 import com.redcom1988.core.util.inject
 import com.redcom1988.core.network.NetworkPreference
 import kotlinx.coroutines.channels.awaitClose
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
         val networkPreference = inject<NetworkPreference>()
         val token = networkPreference.accessToken().get()
-        val initialScreen: Screen = if (token.isNotBlank()) MainScreen else SignInScreen
+        val initialScreen: Screen = if (token.isNotBlank()) MainScreen() else LoginScreen
 
         enableEdgeToEdge()
         setContent {
