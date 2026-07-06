@@ -15,7 +15,7 @@ import java.io.IOException
 import kotlin.coroutines.resumeWithException
 
 val jsonMime = "application/json; charset=utf-8".toMediaType()
-val json = Json { ignoreUnknownKeys = true }
+val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
 
 // Based on https://github.com/gildor/kotlin-coroutines-okhttp
 @OptIn(ExperimentalCoroutinesApi::class)

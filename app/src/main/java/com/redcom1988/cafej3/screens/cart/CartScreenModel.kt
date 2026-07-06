@@ -63,18 +63,21 @@ class CartScreenModel(
         screenModelScope.launch {
             val currentIdx = _state.value.selectedOrderIndex
             val currentOrders = _state.value.pendingOrders
-            val currentId = if (currentIdx in currentOrders.indices) currentOrders[currentIdx].id else null
+            val currentId =
+                if (currentIdx in currentOrders.indices) currentOrders[currentIdx].id else null
             _state.value = _state.value.copy(isLoading = true, error = null)
             try {
                 val isLoggedIn = networkPreference.accessToken().get().isNotBlank()
                 if (isLoggedIn) {
                     val allOrders = getMyOrders.await()
-                    val pending = allOrders.filter { it.status != "DONE" && it.status != "CANCELLED" }
+                    val pending =
+                        allOrders.filter { it.status != "DONE" && it.status != "CANCELLED" }
                     val selectedIndex = if (currentId != null) {
                         pending.indexOfFirst { it.id == currentId }.coerceAtLeast(0)
                     } else {
                         val storedId = tableSession.getActiveOrderId()
-                        if (storedId > 0) pending.indexOfFirst { it.id == storedId }.coerceAtLeast(0) else 0
+                        if (storedId > 0) pending.indexOfFirst { it.id == storedId }
+                            .coerceAtLeast(0) else 0
                     }
                     _state.value = _state.value.copy(
                         pendingOrders = pending,
@@ -82,7 +85,6 @@ class CartScreenModel(
                         isLoading = false
                     )
                 } else {
-                    // Guest: load single active order
                     val hasActiveOrder = tableSession.hasActiveOrder()
                     val hasToken = tableSession.hasTrackingToken()
                     if (hasActiveOrder) {
@@ -93,16 +95,19 @@ class CartScreenModel(
                             getOrderDetail.await(orderId)
                         }
                         _state.value = _state.value.copy(
-                            pendingOrders = if (order.status != "DONE" && order.status != "CANCELLED") listOf(order) else emptyList(),
+                            pendingOrders = if (order.status != "DONE" && order.status != "CANCELLED") listOf(
+                                order
+                            ) else emptyList(),
                             selectedOrderIndex = 0,
                             isLoading = false
                         )
                     } else {
-                        _state.value = _state.value.copy(isLoading = false)
+                        _state.value =
+                            _state.value.copy(pendingOrders = emptyList(), isLoading = false)
                     }
                 }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(isLoading = false)
+                _state.value = _state.value.copy(pendingOrders = emptyList(), isLoading = false)
             }
         }
     }
@@ -124,16 +129,27 @@ class CartScreenModel(
                 _state.value = _state.value.copy(isRefreshing = true)
                 try {
                     val order = if (tableSession.hasTrackingToken()) {
-                        getOrderDetail.trackGuest(orders[idx].id, tableSession.getTrackingToken())
+                        getOrderDetail.trackGuest(
+                            orders[idx].id,
+                            tableSession.getTrackingToken()
+                        )
                     } else {
                         getOrderDetail.await(orders[idx].id)
                     }
                     val updated = orders.toMutableList().also { it[idx] = order }
-                    val pending = updated.filter { it.status != "DONE" && it.status != "CANCELLED" }
+                    val pending =
+                        updated.filter { it.status != "DONE" && it.status != "CANCELLED" }
                     val newIndex = (pending.indexOfFirst { it.id == order.id }).coerceAtLeast(0)
-                    _state.value = _state.value.copy(pendingOrders = pending, selectedOrderIndex = newIndex, isRefreshing = false)
+                    _state.value = _state.value.copy(
+                        pendingOrders = pending,
+                        selectedOrderIndex = newIndex,
+                        isRefreshing = false
+                    )
                 } catch (e: Exception) {
-                    _state.value = _state.value.copy(isRefreshing = false, error = e.message ?: "Failed to refresh order")
+                    _state.value = _state.value.copy(
+                        isRefreshing = false,
+                        error = e.message ?: "Failed to refresh order"
+                    )
                 }
             }
         } else {
@@ -164,7 +180,8 @@ class CartScreenModel(
                     userOffers = available,
                     selectedUserOfferId = finalSelectedId
                 )
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -185,7 +202,8 @@ class CartScreenModel(
                     toRemove.forEach { cartManager.removeItem(it.menuItem.id) }
                     _state.value = _state.value.copy(removedItems = names)
                 }
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -205,18 +223,22 @@ class CartScreenModel(
                     )
                     return@launch
                 }
-                
+
                 val tableId = tableSession.getTableId().takeIf { it > 0 }
                 val items = cartManager.items.value.map { it.menuItem.id to it.quantity }
-                
+
                 val selectedOfferId = _state.value.selectedUserOfferId
-                
+
                 val order = if (isLoggedIn) {
-                    createAuthenticatedOrder.await(tableId = tableId, userOfferId = selectedOfferId, items = items)
+                    createAuthenticatedOrder.await(
+                        tableId = tableId,
+                        userOfferId = selectedOfferId,
+                        items = items
+                    )
                 } else {
                     createOrder.await(tableId = tableId, items = items)
                 }
-                
+
                 val token = order.trackingToken
                 cartManager.clear()
                 tableSession.setActiveOrderId(order.id)
@@ -226,7 +248,7 @@ class CartScreenModel(
                     pendingOrderId = order.id,
                     lastOrder = order
                 )
-                
+
                 if (token != null) {
                     tableSession.setTrackingToken(token)
                 }
@@ -275,7 +297,8 @@ class CartScreenModel(
     fun tableNumber(): String = tableSession.getTableNumber()
 
     fun dismissOrderSuccess() {
-        _state.value = _state.value.copy(orderSuccess = false, lastOrder = null, isLoading = true)
+        _state.value =
+            _state.value.copy(orderSuccess = false, lastOrder = null, isLoading = true)
         loadPendingOrders()
     }
 }

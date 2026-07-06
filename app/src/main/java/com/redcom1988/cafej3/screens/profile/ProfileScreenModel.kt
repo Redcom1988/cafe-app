@@ -59,7 +59,7 @@ class ProfileScreenModel(
     fun logout() {
         screenModelScope.launch {
             logout.await()
-            tableSession.clear()
+            tableSession.clearAll()
         }
     }
 }
