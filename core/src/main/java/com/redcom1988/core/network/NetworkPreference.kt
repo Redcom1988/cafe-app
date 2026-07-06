@@ -11,7 +11,7 @@ class NetworkPreference(
         private const val PROD_BASE_URL = "https://backend-cafe-jasjisjus-production.up.railway.app"
 
         // Devs: toggle this to DEV_BASE_URL for local development
-        private const val BASE_URL = DEV_BASE_URL
+        private const val BASE_URL = PROD_BASE_URL
     }
 
     fun accessToken() = preferenceStore.getString(
